@@ -37,11 +37,35 @@ Two shells carry the blocks:
 The head card is deliberately **static** — it never moves or scales. All motion lives in the stage
 above it. That restraint is what keeps the format readable at feed size.
 
+### Frame break (optional)
+
+`ugc-split-shell` Part 2 adds the shot where the **top of the head rises out of the card** into the
+graphic stage. Build a matte first:
+
+```bash
+npx hyperframes remove-background assets/talkinghead.mp4 -o assets/head-cutout.webm --quality best
+```
+
+That transparent copy is laid over the card in exact pixel alignment and clipped so only the strip
+above the card edge draws — below the edge the normal card plays, so there is no double-render and
+no matte fringe across the face. The shell carries the full derivation; the numbers are computed
+from the card geometry, never nudged by eye.
+
+Two traps it documents, both of which fail quietly:
+
+- **ffmpeg drops VP9 alpha unless you name the decoder** (`-c:v libvpx-vp9`), so alpha reads as
+  fully opaque. Verify with `hyperframes snapshot`, not the browser preview — the render path
+  pre-extracts frames through ffmpeg, so alpha can survive preview and still be lost in the render.
+- **`remove-background` is `u2net_human_seg` — segmentation, not matting.** It degrades at exactly
+  the hair edge this effect puts on display. Expect a faint fringe tinted by the original
+  background: invisible at feed size, obvious at 2x. Real separation between hair and wall when
+  shooting matters more than any post fix.
+
 ## The items
 
 | Item                | Type      | Dur   | What it does                                          |
 | ------------------- | --------- | ----- | ----------------------------------------------------- |
-| `ugc-split-shell`   | component | —     | Host shell: paper, static head card, layer order      |
+| `ugc-split-shell`   | component | —     | Host shell: paper, head card, layer order, frame break |
 | `ugc-wordmark`      | block     | 3.5s  | Letters cascade into a lockup + rule + pill           |
 | `ugc-folder-fan`    | block     | 4.5s  | Chips fan out of a folder along an arc                |
 | `ugc-orbit-ring`    | block     | 5.5s  | Tiles ring a hub, wires draw, counter tallies         |
