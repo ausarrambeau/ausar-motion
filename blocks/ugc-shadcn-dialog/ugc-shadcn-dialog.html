@@ -1,0 +1,227 @@
+<!-- hyperframes-registry-item: ugc-shadcn-dialog -->
+<!doctype html>
+<html
+  lang="en"
+  data-composition-variables='[
+    {"id":"title","type":"string","label":"Dialog title","default":"Approve this run?"},
+    {"id":"description","type":"string","label":"Dialog body","default":"The agent wants to act on your inbox and calendar."},
+    {"id":"scopes","type":"string","label":"Scope badges (| between, max 3)","default":"24 emails|3 calendar events|read + write"},
+    {"id":"cancelLabel","type":"string","label":"Dismiss button","default":"Not now"},
+    {"id":"confirmLabel","type":"string","label":"Confirm button","default":"Approve"},
+    {"id":"confirmedLabel","type":"string","label":"Confirmed button","default":"Approved"},
+    {"id":"caption","type":"string","label":"Caption","default":"you stay in the loop"},
+    {"id":"accent","type":"color","label":"Accent","default":"#CD6E58"}
+  ]'
+>
+  <head>
+    <meta charset="UTF-8" />
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+    <!--
+      GENERATED FILE — do not hand-edit.
+      Source: registry/tools/react-prerender/dialog-app.jsx
+      Rebuild: cd registry/tools/react-prerender && npm run build:dialog
+
+      Real shadcn/ui Dialog + Badge + Button, rendered by React in headless
+      Chrome at build time. No React ships to the renderer.
+
+      BAKED vs LIVE: all text is live. The badge COUNT is baked at three — a
+      fourth entry in the scopes prop is ignored, because the markup for it was
+      never generated.
+    -->
+    <style>
+/*! tailwindcss v4.3.3 | MIT License | https://tailwindcss.com */
+@supports (((-webkit-hyphens:none)) and (not (margin-trim:inline))) or ((-moz-orient:inline) and (not (color:rgb(from red r g b)))){*,:before,:after,::backdrop{--tw-border-style:solid;--tw-leading:initial;--tw-font-weight:initial;--tw-tracking:initial;--tw-shadow:0 0 #0000;--tw-shadow-color:initial;--tw-shadow-alpha:100%;--tw-inset-shadow:0 0 #0000;--tw-inset-shadow-color:initial;--tw-inset-shadow-alpha:100%;--tw-ring-color:initial;--tw-ring-shadow:0 0 #0000;--tw-inset-ring-color:initial;--tw-inset-ring-shadow:0 0 #0000;--tw-ring-inset:initial;--tw-ring-offset-width:0px;--tw-ring-offset-color:#fff;--tw-ring-offset-shadow:0 0 #0000;--tw-outline-style:solid}}:root,:host{--color-black:#000;--spacing:.25rem;--container-lg:32rem;--font-weight-semibold:600;--font-weight-extrabold:800;--tracking-tight:-.025em;--leading-snug:1.375;--default-font-family:"Inter", sans-serif;--default-mono-font-family:"JetBrains Mono", monospace}*,:after,:before,::backdrop{box-sizing:border-box;border:0 solid;margin:0;padding:0}::file-selector-button{box-sizing:border-box;border:0 solid;margin:0;padding:0}html,:host{-webkit-text-size-adjust:100%;tab-size:4;line-height:1.5;font-family:var(--default-font-family);font-feature-settings:var(--default-font-feature-settings,normal);font-variation-settings:var(--default-font-variation-settings,normal);-webkit-tap-highlight-color:transparent}hr{height:0;color:inherit;border-top-width:1px}abbr:where([title]){-webkit-text-decoration:underline dotted;text-decoration:underline dotted}h1,h2,h3,h4,h5,h6{font-size:inherit;font-weight:inherit}a{color:inherit;-webkit-text-decoration:inherit;-webkit-text-decoration:inherit;-webkit-text-decoration:inherit;text-decoration:inherit}b,strong{font-weight:bolder}code,kbd,samp,pre{font-family:var(--default-mono-font-family);font-feature-settings:var(--default-mono-font-feature-settings,normal);font-variation-settings:var(--default-mono-font-variation-settings,normal);font-size:1em}small{font-size:80%}sub,sup{vertical-align:baseline;font-size:75%;line-height:0;position:relative}sub{bottom:-.25em}sup{top:-.5em}table{text-indent:0;border-color:inherit;border-collapse:collapse}:-moz-focusring:where(:not(iframe)){outline:auto}progress{vertical-align:baseline}summary{display:list-item}ol,ul,menu{list-style:none}img,svg,video,canvas,audio,iframe,embed,object{vertical-align:middle;display:block}img,video{max-width:100%;height:auto}button,input,select,optgroup,textarea{font:inherit;font-feature-settings:inherit;font-variation-settings:inherit;letter-spacing:inherit;color:inherit;opacity:1;background-color:#0000;border-radius:0}::file-selector-button{font:inherit;font-feature-settings:inherit;font-variation-settings:inherit;letter-spacing:inherit;color:inherit;opacity:1;background-color:#0000;border-radius:0}:where(select:is([multiple],[size])) optgroup{font-weight:bolder}:where(select:is([multiple],[size])) optgroup option{padding-inline-start:20px}::file-selector-button{margin-inline-end:4px}::placeholder{opacity:1}@supports (not ((-webkit-appearance:-apple-pay-button))) or (contain-intrinsic-size:1px){::placeholder{color:currentColor}@supports (color:color-mix(in lab, red, red)){::placeholder{color:color-mix(in oklab, currentcolor 50%, transparent)}}}textarea{resize:vertical}::-webkit-search-decoration{-webkit-appearance:none}::-webkit-date-and-time-value{min-height:1lh;text-align:inherit}::-webkit-datetime-edit{display:inline-flex}::-webkit-datetime-edit-fields-wrapper{padding:0}::-webkit-datetime-edit{padding-block:0}::-webkit-datetime-edit-year-field{padding-block:0}::-webkit-datetime-edit-month-field{padding-block:0}::-webkit-datetime-edit-day-field{padding-block:0}::-webkit-datetime-edit-hour-field{padding-block:0}::-webkit-datetime-edit-minute-field{padding-block:0}::-webkit-datetime-edit-second-field{padding-block:0}::-webkit-datetime-edit-millisecond-field{padding-block:0}::-webkit-datetime-edit-meridiem-field{padding-block:0}::-webkit-calendar-picker-indicator{line-height:1}:-moz-ui-invalid{box-shadow:none}button,input:where([type=button],[type=reset],[type=submit]){appearance:button}::file-selector-button{appearance:button}::-webkit-inner-spin-button{height:auto}::-webkit-outer-spin-button{height:auto}[hidden]:where(:not([hidden=until-found])){display:none!important}.fixed{position:fixed}.relative{position:relative}.inset-0{inset:0}.top-\[50\%\]{top:50%}.left-\[50\%\]{left:50%}.z-50{z-index:50}.col-start-1{grid-column-start:1}.row-start-1{grid-row-start:1}.flex{display:flex}.grid{display:grid}.inline-flex{display:inline-flex}.inline-grid{display:inline-grid}.h-auto{height:auto}.w-fit{width:fit-content}.w-full{width:100%}.max-w-\[calc\(100\%-2rem\)\]{max-width:calc(100% - 2rem)}.shrink-0{flex-shrink:0}.flex-col{flex-direction:column}.flex-col-reverse{flex-direction:column-reverse}.flex-wrap{flex-wrap:wrap}.items-center{align-items:center}.justify-center{justify-content:center}.gap-1{gap:var(--spacing)}.gap-2{gap:calc(var(--spacing) * 2)}.gap-3{gap:calc(var(--spacing) * 3)}.gap-4{gap:calc(var(--spacing) * 4)}.gap-9{gap:calc(var(--spacing) * 9)}.overflow-hidden{overflow:hidden}.rounded-\[32px\]{border-radius:32px}.rounded-full{border-radius:3.40282e38px}.border{border-style:var(--tw-border-style);border-width:1px}.border-border{border-color:var(--border)}.bg-background{background-color:var(--background)}.bg-black\/50{background-color:#00000080}@supports (color:color-mix(in lab, red, red)){.bg-black\/50{background-color:color-mix(in oklab, var(--color-black) 50%, transparent)}}.bg-primary{background-color:var(--primary)}.p-14{padding:calc(var(--spacing) * 14)}.px-6{padding-inline:calc(var(--spacing) * 6)}.px-10{padding-inline:calc(var(--spacing) * 10)}.py-2\.5{padding-block:calc(var(--spacing) * 2.5)}.py-5{padding-block:calc(var(--spacing) * 5)}.text-center{text-align:center}.text-\[27px\]{font-size:27px}.text-\[29px\]{font-size:29px}.text-\[31px\]{font-size:31px}.text-\[62px\]{font-size:62px}.leading-none{--tw-leading:1;line-height:1}.leading-snug{--tw-leading:var(--leading-snug);line-height:var(--leading-snug)}.font-extrabold{--tw-font-weight:var(--font-weight-extrabold);font-weight:var(--font-weight-extrabold)}.font-semibold{--tw-font-weight:var(--font-weight-semibold);font-weight:var(--font-weight-semibold)}.tracking-tight{--tw-tracking:var(--tracking-tight);letter-spacing:var(--tracking-tight)}.whitespace-nowrap{white-space:nowrap}.text-foreground{color:var(--foreground)}.text-muted-foreground{color:var(--muted-foreground)}.text-primary-foreground{color:var(--primary-foreground)}.shadow-lg{--tw-shadow:0 10px 15px -3px var(--tw-shadow-color,#0000001a), 0 4px 6px -4px var(--tw-shadow-color,#0000001a);box-shadow:var(--tw-inset-shadow), var(--tw-inset-ring-shadow), var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow)}.shadow-xs{--tw-shadow:0 1px 2px 0 var(--tw-shadow-color,#0000000d);box-shadow:var(--tw-inset-shadow), var(--tw-inset-ring-shadow), var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow)}.outline{outline-style:var(--tw-outline-style);outline-width:1px}.outline-none{--tw-outline-style:none;outline-style:none}@media (hover:hover){.hover\:bg-accent:hover{background-color:var(--accent)}.hover\:bg-primary\/90:hover{background-color:var(--primary)}@supports (color:color-mix(in lab, red, red)){.hover\:bg-primary\/90:hover{background-color:color-mix(in oklab, var(--primary) 90%, transparent)}}.hover\:text-accent-foreground:hover{color:var(--accent-foreground)}}.focus-visible\:border-ring:focus-visible{border-color:var(--ring)}.focus-visible\:ring-\[3px\]:focus-visible{--tw-ring-shadow:var(--tw-ring-inset,) 0 0 0 calc(3px + var(--tw-ring-offset-width)) var(--tw-ring-color,currentcolor);box-shadow:var(--tw-inset-shadow), var(--tw-inset-ring-shadow), var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow)}.focus-visible\:ring-ring\/50:focus-visible{--tw-ring-color:var(--ring)}@supports (color:color-mix(in lab, red, red)){.focus-visible\:ring-ring\/50:focus-visible{--tw-ring-color:color-mix(in oklab, var(--ring) 50%, transparent)}}.disabled\:pointer-events-none:disabled{pointer-events:none}.disabled\:opacity-50:disabled{opacity:.5}.aria-invalid\:border-destructive[aria-invalid=true]{border-color:var(--destructive)}.aria-invalid\:ring-destructive\/20[aria-invalid=true]{--tw-ring-color:var(--destructive)}@supports (color:color-mix(in lab, red, red)){.aria-invalid\:ring-destructive\/20[aria-invalid=true]{--tw-ring-color:color-mix(in oklab, var(--destructive) 20%, transparent)}}@media (min-width:40rem){.sm\:max-w-lg{max-width:var(--container-lg)}.sm\:flex-row{flex-direction:row}.sm\:justify-end{justify-content:flex-end}.sm\:text-left{text-align:left}}@media (prefers-color-scheme:dark){.dark\:border-input{border-color:var(--input)}.dark\:bg-input\/30{background-color:var(--input)}@supports (color:color-mix(in lab, red, red)){.dark\:bg-input\/30{background-color:color-mix(in oklab, var(--input) 30%, transparent)}}@media (hover:hover){.dark\:hover\:bg-input\/50:hover{background-color:var(--input)}@supports (color:color-mix(in lab, red, red)){.dark\:hover\:bg-input\/50:hover{background-color:color-mix(in oklab, var(--input) 50%, transparent)}}}.dark\:aria-invalid\:ring-destructive\/40[aria-invalid=true]{--tw-ring-color:var(--destructive)}@supports (color:color-mix(in lab, red, red)){.dark\:aria-invalid\:ring-destructive\/40[aria-invalid=true]{--tw-ring-color:color-mix(in oklab, var(--destructive) 40%, transparent)}}}:root{--radius:.625rem;--background:oklch(100% 0 0);--foreground:oklch(14.5% 0 0);--card:oklch(100% 0 0);--card-foreground:oklch(14.5% 0 0);--primary:oklch(58% .13 35);--primary-foreground:oklch(98.5% 0 0);--secondary:oklch(97% 0 0);--secondary-foreground:oklch(20.5% 0 0);--muted:oklch(97% 0 0);--muted-foreground:oklch(55.6% 0 0);--accent:oklch(97% 0 0);--accent-foreground:oklch(20.5% 0 0);--destructive:oklch(57.7% .245 27.325);--border:oklch(92.2% 0 0);--input:oklch(92.2% 0 0);--ring:oklch(70.8% 0 0)}@property --tw-border-style{syntax:"*";inherits:false;initial-value:solid}@property --tw-leading{syntax:"*";inherits:false}@property --tw-font-weight{syntax:"*";inherits:false}@property --tw-tracking{syntax:"*";inherits:false}@property --tw-shadow{syntax:"*";inherits:false;initial-value:0 0 #0000}@property --tw-shadow-color{syntax:"*";inherits:false}@property --tw-shadow-alpha{syntax:"<percentage>";inherits:false;initial-value:100%}@property --tw-inset-shadow{syntax:"*";inherits:false;initial-value:0 0 #0000}@property --tw-inset-shadow-color{syntax:"*";inherits:false}@property --tw-inset-shadow-alpha{syntax:"<percentage>";inherits:false;initial-value:100%}@property --tw-ring-color{syntax:"*";inherits:false}@property --tw-ring-shadow{syntax:"*";inherits:false;initial-value:0 0 #0000}@property --tw-inset-ring-color{syntax:"*";inherits:false}@property --tw-inset-ring-shadow{syntax:"*";inherits:false;initial-value:0 0 #0000}@property --tw-ring-inset{syntax:"*";inherits:false}@property --tw-ring-offset-width{syntax:"<length>";inherits:false;initial-value:0}@property --tw-ring-offset-color{syntax:"*";inherits:false;initial-value:#fff}@property --tw-ring-offset-shadow{syntax:"*";inherits:false;initial-value:0 0 #0000}@property --tw-outline-style{syntax:"*";inherits:false;initial-value:solid}
+    </style>
+    <style>
+      #root {
+        position: absolute;
+        inset: 0;
+        font-family: "Inter", sans-serif;
+        --accent: #cd6e58;
+      }
+      /* Radix ships these as position:fixed. Inside a composition that is a trap:
+         once GSAP puts a transform on any ancestor, fixed resolves against that
+         ancestor instead of the viewport. #root is inset:0 at full canvas size,
+         so absolute is equivalent and immune. These rules follow the Tailwind
+         layer, so they win. */
+      [data-slot="dialog-overlay"],
+      [data-slot="dialog-content"] {
+        position: absolute;
+      }
+      [data-slot="dialog-overlay"] {
+        opacity: 0;
+      }
+      /* ⚠ The renderer embeds real Inter; a local browser usually falls back to a
+         narrower face. Text is therefore WIDER in the render than in preview, and
+         a footer that fits on screen can walk out of the dialog's padding once
+         rendered — measured 4px overflow in-browser vs 50px in the render.
+         DialogContent is a grid, and grid items default to min-width:auto, so
+         they refuse to shrink and overflow instead. Pin the track and let them. */
+      [data-slot="dialog-content"] {
+        grid-template-columns: minmax(0, 1fr);
+      }
+      [data-slot="dialog-content"] > * {
+        min-width: 0;
+      }
+      [data-slot="dialog-footer"] {
+        flex-wrap: wrap;
+      }
+      [data-slot="dialog-content"] {
+        /* ⚠ shadcn hard-codes sm:max-w-lg (512px) on DialogContent. The renderer
+           is a fixed 1080px viewport, so the sm: breakpoint ALWAYS matches, and
+           tailwind-merge does not merge across breakpoint variants — a w-[860px]
+           on the className loses to it silently and the dialog renders half size.
+           No backticks in this comment: it lives inside a template literal.
+           Settle it here, after the Tailwind layer, where it cannot be outvoted. */
+        width: 880px;
+        max-width: none;
+        opacity: 0;
+        border: 1.5px solid #eceae6;
+        box-shadow: 0 30px 90px rgba(17, 17, 17, 0.22);
+      }
+      /* The confirmed state sits exactly on top of the idle one and is revealed
+         by a tl.set crossfade, so a reverse seek can never strand the wrong one. */
+      #sd-confirmed {
+        opacity: 0;
+      }
+      /* The pack's full-bleed caption treatment (.bcap in ugc-dashboard), in
+         paper-on-dark here because the overlay dims the frame behind it. */
+      #sd-caption {
+        position: absolute;
+        /* Above the overlay. Radix gives the scrim z-50 and it covers the whole
+           frame, so anything painted without a z-index sits underneath it — the
+           caption rendered but was invisible. */
+        z-index: 60;
+        left: 0;
+        top: 1480px;
+        width: 1080px;
+        text-align: center;
+        font-family: "Playfair Display", serif;
+        font-weight: 900;
+        font-style: italic;
+        font-size: 74px;
+        text-transform: uppercase;
+        color: #fdfdfd;
+        opacity: 0;
+      }
+    </style>
+  </head>
+  <body>
+    <div
+      id="root"
+      data-composition-id="ugc-shadcn-dialog"
+      data-start="0"
+      data-duration="5"
+      data-width="1080"
+      data-height="1920"
+    >
+      <div id="sd-stage" class="clip" data-start="0" data-duration="5" data-track-index="0">
+        <span data-radix-focus-guard="" data-aria-hidden="true" style="outline: none; opacity: 0; position: absolute; pointer-events: none;"></span><div id="mount" data-aria-hidden="true"></div><div data-state="open" data-slot="dialog-overlay" class="fixed inset-0 z-50 bg-black/50" data-aria-hidden="true" style="pointer-events: auto;"></div><div id="radix-_r0_" data-state="open" data-slot="dialog-content" class="fixed top-[50%] left-[50%] z-50 grid w-full max-w-[calc(100%-2rem)] border bg-background shadow-lg outline-none sm:max-w-lg gap-9 rounded-[32px] p-14" style="pointer-events: auto;"><div data-slot="dialog-header" class="flex flex-col text-center sm:text-left gap-3"><h2 id="sd-title" data-slot="dialog-title" class="text-[62px] font-extrabold leading-none tracking-tight">Approve this run?</h2><p id="sd-desc" data-slot="dialog-description" class="text-muted-foreground text-[31px] leading-snug">The agent wants to act on your inbox and calendar.</p></div><div id="sd-badges" class="flex flex-wrap gap-4"><span data-slot="badge" data-variant="outline" class="inline-flex w-fit shrink-0 items-center justify-center gap-1 overflow-hidden border whitespace-nowrap focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 aria-invalid:border-destructive aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 [&amp;&gt;svg]:pointer-events-none [&amp;&gt;svg]:size-3 border-border text-foreground [a&amp;]:hover:bg-accent [a&amp;]:hover:text-accent-foreground rounded-full px-6 py-2.5 text-[27px] font-semibold" data-i="0" style="background: var(--accent); color: rgb(255, 255, 255); border: 2px solid transparent;">24 emails</span><span data-slot="badge" data-variant="outline" class="inline-flex w-fit shrink-0 items-center justify-center gap-1 overflow-hidden border whitespace-nowrap focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 aria-invalid:border-destructive aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 [&amp;&gt;svg]:pointer-events-none [&amp;&gt;svg]:size-3 border-border text-foreground [a&amp;]:hover:bg-accent [a&amp;]:hover:text-accent-foreground rounded-full px-6 py-2.5 text-[27px] font-semibold" data-i="1" style="background: rgb(237, 234, 229); color: rgb(74, 69, 64); border: 2px solid transparent;">3 calendar events</span><span data-slot="badge" data-variant="outline" class="inline-flex w-fit shrink-0 items-center justify-center gap-1 overflow-hidden border whitespace-nowrap focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 aria-invalid:border-destructive aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 [&amp;&gt;svg]:pointer-events-none [&amp;&gt;svg]:size-3 border-border text-foreground [a&amp;]:hover:bg-accent [a&amp;]:hover:text-accent-foreground rounded-full px-6 py-2.5 text-[27px] font-semibold" data-i="2" style="background: transparent; color: rgb(74, 69, 64); border: 2px solid rgb(201, 195, 186);">read + write</span></div><div data-slot="dialog-footer" class="flex flex-col-reverse sm:flex-row gap-4 sm:justify-end"><button data-slot="button" data-variant="outline" data-size="default" class="inline-flex shrink-0 items-center justify-center gap-2 whitespace-nowrap outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 disabled:pointer-events-none disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 [&amp;_svg]:pointer-events-none [&amp;_svg]:shrink-0 [&amp;_svg:not([class*='size-'])]:size-4 border bg-background shadow-xs hover:bg-accent hover:text-accent-foreground dark:border-input dark:bg-input/30 dark:hover:bg-input/50 has-[&gt;svg]:px-3 h-auto rounded-full px-10 py-5 text-[29px] font-semibold" id="sd-cancel">Not now</button><span class="relative inline-grid"><button data-slot="button" data-variant="default" data-size="default" class="inline-flex shrink-0 items-center justify-center gap-2 whitespace-nowrap outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 disabled:pointer-events-none disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 [&amp;_svg]:pointer-events-none [&amp;_svg]:shrink-0 [&amp;_svg:not([class*='size-'])]:size-4 bg-primary text-primary-foreground hover:bg-primary/90 has-[&gt;svg]:px-3 col-start-1 row-start-1 h-auto rounded-full px-10 py-5 text-[29px] font-semibold" id="sd-confirm" style="background: var(--accent); color: rgb(255, 255, 255);">Approve</button><button data-slot="button" data-variant="default" data-size="default" class="inline-flex shrink-0 items-center justify-center gap-2 whitespace-nowrap outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 disabled:pointer-events-none disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 [&amp;_svg]:pointer-events-none [&amp;_svg]:shrink-0 [&amp;_svg:not([class*='size-'])]:size-4 bg-primary text-primary-foreground hover:bg-primary/90 has-[&gt;svg]:px-3 col-start-1 row-start-1 h-auto rounded-full px-10 py-5 text-[29px] font-semibold" id="sd-confirmed" style="background: rgb(18, 161, 80); color: rgb(255, 255, 255);">Approved</button></span></div></div><span data-radix-focus-guard="" data-aria-hidden="true" style="outline: none; opacity: 0; position: absolute; pointer-events: none;"></span>
+      </div>
+      <div id="sd-caption" class="clip" data-start="0" data-duration="5" data-track-index="1">
+        you stay in the loop
+      </div>
+    </div>
+
+    <script>
+      (function () {
+        window.__timelines = window.__timelines || {};
+        // Props: declared on <html>, overridable per mount via data-variable-values.
+        // ⚠ The accessor is window.__hyperframes.getVariables(). Getting it wrong
+        // fails SILENTLY: V is {}, every prop falls through to its default, lint
+        // and check stay clean, and the render looks right because the defaults
+        // ARE the design. The only tell is that an override does nothing.
+        const V =
+          (window.__hyperframes && window.__hyperframes.getVariables
+            ? window.__hyperframes.getVariables()
+            : null) || {};
+
+        const root = document.getElementById("root");
+        if (V.accent) root.style.setProperty("--accent", V.accent);
+
+        const set = (id, val) => {
+          if (val) document.getElementById(id).textContent = val;
+        };
+        set("sd-title", V.title);
+        set("sd-desc", V.description);
+        set("sd-cancel", V.cancelLabel);
+        set("sd-confirm", V.confirmLabel);
+        set("sd-confirmed", V.confirmedLabel);
+        set("sd-caption", V.caption);
+
+        // The badge count is baked; only the text is live.
+        const badges = Array.from(document.querySelectorAll('#sd-badges [data-slot="badge"]'));
+        if (V.scopes) {
+          String(V.scopes)
+            .split("|")
+            .slice(0, badges.length)
+            .forEach((t, i) => {
+              badges[i].textContent = t.trim();
+            });
+        }
+
+        const overlay = document.querySelector('[data-slot="dialog-overlay"]');
+        const content = document.querySelector('[data-slot="dialog-content"]');
+
+        // GSAP owns the ENTIRE transform. xPercent/yPercent replace the Tailwind
+        // centering classes stripped at build time and compose with scale/y.
+        gsap.set(content, { xPercent: -50, yPercent: -50 });
+
+        const tl = gsap.timeline({ paused: true });
+
+        // Scrim first, then the dialog lands on it.
+        tl.to(overlay, { opacity: 1, duration: 0.42, ease: "power2.out" }, 0);
+        tl.fromTo(
+          content,
+          { opacity: 0, scale: 0.9, y: 46 },
+          { opacity: 1, scale: 1, y: 0, duration: 0.6, ease: "back.out(1.6)" },
+          0.14,
+        );
+
+        // waterfall-entry on the copy
+        tl.fromTo(
+          ["#sd-title", "#sd-desc"],
+          { y: 22, opacity: 0 },
+          { y: 0, opacity: 1, duration: 0.34, ease: "power3.out", stagger: 0.1 },
+          0.42,
+        );
+
+        // spring-pop-entrance, staggered — the badge beat
+        tl.fromTo(
+          '#sd-badges [data-slot="badge"]',
+          { scale: 0, rotate: -6 },
+          { scale: 1, rotate: 0, duration: 0.42, ease: "back.out(2.8)", stagger: 0.11 },
+          0.82,
+        );
+        tl.fromTo(
+          ["#sd-cancel", "#sd-confirm"],
+          { y: 18, opacity: 0 },
+          { y: 0, opacity: 1, duration: 0.32, ease: "power3.out", stagger: 0.08 },
+          1.32,
+        );
+
+        // physics-press-reaction, then scale-swap-transition to the confirmed state
+        tl.to("#sd-confirm", { scale: 0.93, duration: 0.12, ease: "power2.in" }, 2.35);
+        tl.to("#sd-confirm", { scale: 1, duration: 0.22, ease: "back.out(3)" }, 2.47);
+        tl.set("#sd-confirm", { opacity: 0 }, 2.72);
+        tl.set("#sd-confirmed", { opacity: 1 }, 2.72);
+        tl.fromTo(
+          "#sd-confirmed",
+          { scale: 0.8 },
+          { scale: 1, duration: 0.36, ease: "back.out(2.4)" },
+          2.72,
+        );
+
+        gsap.set("#sd-caption", { opacity: 1 });
+        tl.fromTo(
+          "#sd-caption",
+          { y: 22, opacity: 0 },
+          { y: 0, opacity: 1, duration: 0.34, ease: "power3.out" },
+          3.35,
+        );
+
+        window.__timelines["ugc-shadcn-dialog"] = tl;
+      })();
+    </script>
+  </body>
+</html>

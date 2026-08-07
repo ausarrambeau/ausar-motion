@@ -1,143 +1,50 @@
 /**
- * shadcn/ui + Recharts → the `ugc-shadcn-card` HyperFrames block.
+ * shadcn/ui + Recharts → the `ugc-shadcn-card` block.
  *
- * WHY A BROWSER AND NOT renderToStaticMarkup
- * Measured, not assumed (see proof/):
- *   - shadcn's own markup (Card/Badge, cva + tailwind-merge)  → server-renders fine
- *   - Radix inline primitives                                 → render, but effects
- *     never run, so data-state is stuck at "indeterminate"
- *   - Radix portals (Dialog/Tooltip/Popover/Select)           → render EMPTY
- *   - Recharts 3.x                                            → renders an empty
- *     <div class="recharts-wrapper"> and NO svg (2.x does server-render)
- * Mounting once in a real headless Chrome fixes all four at the same time, so
- * that is the only path here. React runs at BUILD time and is thrown away; the
- * emitted block is static markup + one stylesheet + GSAP.
+ * The generic pipeline (browser mount, de-lint, Tailwind) and every render-only
+ * trap it guards against live in ./prerender-lib.mjs. Only card-specific work is
+ * here.
  *
  * Run:  npm run build:card
  */
-import * as esbuild from "esbuild";
-import { execFileSync } from "node:child_process";
 import { svgPathProperties } from "svg-path-properties";
-import { readFileSync, writeFileSync, mkdirSync, rmSync } from "node:fs";
+import { writeFileSync, mkdirSync, rmSync } from "node:fs";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
+import { prerender, delint, compileTailwind, VARIABLES_PREAMBLE } from "./prerender-lib.mjs";
 
 const __dir = dirname(fileURLToPath(import.meta.url));
 const TMP = resolve(__dir, ".card-build");
 const OUT = resolve(__dir, "../../blocks/ugc-shadcn-card/ugc-shadcn-card.html");
-const CHROME = "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome";
 
 const DURATION = 5.5;
 const CARD_LEFT = 70;
 const CARD_TOP = 452;   // = ugc-dashboard's panel top, so full-bleed scenes align
 
-mkdirSync(TMP, { recursive: true });
-
-/* ------------------------------------------------- 1. bundle for the browser */
-console.log("→ bundling shadcn + recharts for headless mount");
-await esbuild.build({
-  entryPoints: [resolve(__dir, "card-app.jsx")],
-  bundle: true,
-  format: "iife",
-  platform: "browser",
-  jsx: "automatic",
-  loader: { ".tsx": "tsx", ".ts": "ts", ".jsx": "jsx" },
-  alias: { "@/lib/utils": resolve(__dir, "shadcn-src/lib/utils.ts") },
-  define: { "process.env.NODE_ENV": '"production"' },
-  outfile: resolve(TMP, "bundle.js"),
-  logLevel: "error",
+let markup = await prerender({
+  dir: __dir,
+  tmp: TMP,
+  entry: resolve(__dir, "card-app.jsx"),
+  expect: ['data-slot="card"', 'data-slot="progress"', "<svg", "recharts-area-curve"],
 });
 
-writeFileSync(
-  resolve(TMP, "page.html"),
-  `<!doctype html><html><head><meta charset="utf-8"></head>
-<body><div id="mount"></div><script>${readFileSync(resolve(TMP, "bundle.js"), "utf8")}</script></body></html>`
-);
-
-/* --------------------------------- 2. mount once, serialise what React built */
-console.log("→ mounting in headless Chrome");
-const dom = execFileSync(
-  CHROME,
-  [
-    "--headless",
-    "--disable-gpu",
-    "--no-sandbox",
-    // Deliberately NO --user-data-dir: pointing Chrome at a fresh profile makes
-    // it run first-run setup and hang forever instead of dumping.
-    // Virtual time, not wall-clock: deterministic across machines.
-    "--virtual-time-budget=6000",
-    "--dump-dom",
-    `file://${resolve(TMP, "page.html")}`,
-  ],
-  { encoding: "utf8", maxBuffer: 64 * 1024 * 1024, stdio: ["ignore", "pipe", "ignore"] }
-);
-
-let markup = /<div id="mount">([\s\S]*?)<\/div>\s*<script/.exec(dom)?.[1] ?? "";
-if (!markup.includes('data-slot="card"')) throw new Error("capture failed: no shadcn card in DOM");
-if (!markup.includes("<svg")) throw new Error("capture failed: recharts produced no svg");
-
-/* --------------------------------------------------------- 3. de-lint markup
-   Two things React/Recharts emit that a seekable renderer cannot keep. */
-const hadTransition = markup.includes("transition-all");
+/* -------------------------------------------------- card-specific de-linting */
 // Radix fills the bar by translating the indicator left; the parent clips it.
-// That is intentional, so declare it or the layout checker flags it every frame.
+// Intentional, so declare it or the layout checker flags it on every frame.
 markup = markup.replace(/(data-slot="progress-indicator")/, '$1 data-layout-allow-overflow');
-markup = markup.replace(/\s*transition-all/g, ""); // GSAP must own progress fill
-markup = markup
-  .replace(/<div class="recharts-tooltip-wrapper[\s\S]*?<\/div>/g, "") // hover-only, dead weight
-  .replace(/\s(?:tabindex|role|aria-[a-z-]+)="[^"]*"/g, ""); // interaction affordances
+// Recharts' tooltip layer is hover-only — dead weight in a video.
+markup = markup.replace(/<div class="recharts-tooltip-wrapper[\s\S]*?<\/div>/g, "");
 
-/* ⛔ THE ONE THAT SILENTLY EATS THE CHART.
-   Recharts' <Surface> emits `<title></title><desc></desc>` for screen readers.
-   HyperFrames compiles compositions with an HTML parser, where <title> is an
-   RCDATA element — so everything after it is consumed as escaped TEXT, and the
-   entire chart collapses into a single text node inside <title>. The file looks
-   perfect on disk and renders fine opened directly in a browser; it is empty
-   only in the render. Symptom is "GSAP target not found" for every SVG selector.
-   Strip them — a video has no screen reader. */
-const a11yTags = (markup.match(/<(?:title|desc)>/g) || []).length;
-markup = markup.replace(/<(title|desc)>[\s\S]*?<\/\1>/g, "");
-
-/* ------------------------ 4. measure the curve IN NODE, never at render time */
-const curveD = /class="recharts-curve recharts-area-curve"[^>]*\bd="([^"]+)"/.exec(markup)?.[1]
-  ?? /<path[^>]*class="[^"]*recharts-area-curve[^"]*"[^>]*d="([^"]+)"/.exec(markup)?.[1];
+/* Measure the curve IN NODE. Never call getTotalLength() in a timeline callback:
+   the renderer seeks non-linearly, so measured geometry becomes seek-order
+   dependent. The dash length ships as a baked constant. */
+const curveD = /class="recharts-curve recharts-area-curve"[^>]*\bd="([^"]+)"/.exec(markup)?.[1];
 if (!curveD) throw new Error("could not find the area curve path to measure");
 const pathLen = Math.ceil(new svgPathProperties(curveD).getTotalLength());
 
-/* GSAP targets the recharts-* CLASSES, not injected ids. Recharts already puts a
-   React useId on these paths, and a second id attribute is simply ignored — the
-   first one wins, silently, so half the tweens would find nothing.
-
-   Those generated ids look like `recharts-area-:r0:`. The colons make them
-   require CSS escaping, which HyperFrames flags and which can take down a whole
-   timeline. Rewrite them (and the url(#…) references that point at them) to a
-   plain token. */
-const unsafeIds = (markup.match(/:r[0-9a-z]+:/g) || []).length;
-markup = markup.replace(/:r([0-9a-z]+):/g, "_r$1_");
-
-/* --------------- 5. Tailwind v4 against the EMITTED markup, not the source ---
-   cva + tailwind-merge decide the final class list at render time, so scanning
-   the .tsx would compile classes that lost and miss the ones that won. */
-console.log("→ compiling Tailwind v4 against the emitted markup");
-writeFileSync(resolve(TMP, "scan.html"), markup);
-// @source, not --content: the theme uses source(none), which makes --content inert.
-writeFileSync(
-  resolve(TMP, "input.css"),
-  `@source "${resolve(TMP, "scan.html")}";\n` + readFileSync(resolve(__dir, "shadcn-theme.css"), "utf8")
-);
-execFileSync(
-  resolve(__dir, "node_modules/.bin/tailwindcss"),
-  ["--input", resolve(TMP, "input.css"), "--output", resolve(TMP, "styles.css"), "--minify"],
-  { stdio: ["ignore", "ignore", "inherit"] }
-);
-let css = readFileSync(resolve(TMP, "styles.css"), "utf8").trim();
-
-/* Tailwind's preflight writes `var(--default-font-family, -apple-system, …,
-   "Apple Color Emoji", …)`. We define the variable, so that fallback list is
-   dead code — but HyperFrames resolves every family it finds in the CSS TEXT
-   and will happily embed 183 MB of Apple Color Emoji into the render. Drop it. */
-const fontFallbacks = (css.match(/var\(--default-(?:mono-)?font-family,/g) || []).length;
-css = css.replace(/var\((--default-(?:mono-)?font-family),[^)]*\)/g, "var($1)");
+const dl = delint(markup);
+markup = dl.markup;
+const { css, fontFallbacks } = compileTailwind({ dir: __dir, tmp: TMP, markup });
 
 /* -------------------------------------------------------- 6. emit the block */
 const block = `<!-- hyperframes-registry-item: ugc-shadcn-card -->
@@ -242,15 +149,7 @@ ${markup
     <script>
       (function () {
         window.__timelines = window.__timelines || {};
-        // Props: declared on <html>, overridable per mount via data-variable-values.
-        // ⚠ The accessor is window.__hyperframes.getVariables() — there is no
-        // window.__variables. Getting it wrong fails SILENTLY: V is {}, every prop
-        // falls through to its default, and the block looks correct because the
-        // defaults are the design. Nothing errors and lint stays clean.
-        const V =
-          (window.__hyperframes && window.__hyperframes.getVariables
-            ? window.__hyperframes.getVariables()
-            : null) || {};
+        ${VARIABLES_PREAMBLE}
         const root = document.getElementById("root");
         if (V.accent) root.style.setProperty("--accent", V.accent);
 
@@ -351,7 +250,8 @@ rmSync(TMP, { recursive: true, force: true });
 
 console.log(
   `\n  markup ${(markup.length / 1024).toFixed(1)} KB · CSS ${(css.length / 1024).toFixed(1)} KB` +
-    ` · curve ${pathLen}px · transition-all stripped: ${hadTransition ? "yes" : "NOT FOUND"}` +
-    ` · unsafe ids rewritten: ${unsafeIds} · svg a11y tags stripped: ${a11yTags} · font fallbacks pruned: ${fontFallbacks}`
+    ` · curve ${pathLen}px · a11y ${dl.stats.a11yTags} · unsafe ids ${dl.stats.unsafeIds}` +
+    ` · transition classes ${dl.stats.transitions} · fixed→abs ${dl.stats.fixedPositions}` +
+    ` · font fallbacks ${fontFallbacks}`
 );
 console.log(`  → ${OUT}`);

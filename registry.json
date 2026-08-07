@@ -42,6 +42,10 @@
     {
       "name": "ugc-shadcn-card",
       "type": "hyperframes:block"
+    },
+    {
+      "name": "ugc-shadcn-dialog",
+      "type": "hyperframes:block"
     }
   ]
 }

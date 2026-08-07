@@ -1,0 +1,20 @@
+{
+  "$schema": "https://hyperframes.heygen.com/schema/registry-item.json",
+  "name": "ugc-shadcn-dialog",
+  "type": "hyperframes:block",
+  "title": "UGC — shadcn Approval Dialog",
+  "description": "A real shadcn/ui Dialog: scrim dims the frame, the modal springs in, scope badges pop, then the confirm button presses and swaps to a confirmed state",
+  "tags": ["ugc-split", "react", "moment"],
+  "dimensions": {
+    "width": 1080,
+    "height": 1920
+  },
+  "duration": 5,
+  "files": [
+    {
+      "path": "ugc-shadcn-dialog.html",
+      "target": "compositions/ugc-shadcn-dialog.html",
+      "type": "hyperframes:composition"
+    }
+  ]
+}
