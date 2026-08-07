@@ -1,0 +1,194 @@
+<!-- hyperframes-registry-item: ugc-wordmark -->
+<!doctype html>
+<html
+  lang="en"
+  data-composition-variables='[
+    {"id":"wordmark","type":"string","label":"Wordmark","default":"OPERATOR"},
+    {"id":"pill","type":"string","label":"Pill text","default":"motion template"},
+    {"id":"captions","type":"string","label":"Seam captions (text@seconds, pipe-separated)","default":"Here&#39;s@0.15|the whole@1.0|system@2.0"},
+    {"id":"accent","type":"color","label":"Accent","default":"#CD6E58"},
+    {"id":"ink","type":"color","label":"Ink","default":"#111111"}
+  ]'
+>
+  <head>
+    <meta charset="UTF-8" />
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      html,
+      body {
+        /* Transparent on mount — the host's shell paints paper and the head card.
+           The colour here only shows when previewing this file standalone. */
+        background: #fdfdfd;
+        overflow: hidden;
+      }
+      body {
+        width: 1080px;
+        height: 1920px;
+      }
+      #root {
+        position: absolute;
+        inset: 0;
+      }
+      #root .stage {
+        position: absolute;
+        left: 0;
+        top: 120px;
+        width: 1080px;
+        height: 700px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 34px;
+      }
+      #root .wordmark {
+        display: flex;
+        justify-content: center;
+        font-family: "Archivo Black", sans-serif; /* weight 400 ONLY */
+        font-size: 118px;
+        line-height: 1;
+        letter-spacing: -0.02em;
+        color: var(--ink, #111111);
+        overflow: hidden;
+        padding: 10px 0;
+      }
+      #root .uw-ltr {
+        display: inline-block;
+        opacity: 0;
+      }
+      #root .rule {
+        display: block;
+        width: 520px;
+        height: 6px;
+        background: var(--ink, #111111);
+        border-radius: 3px;
+        transform-origin: 50% 50%;
+      }
+      #root .pill {
+        display: inline-block;
+        padding: 16px 34px;
+        border-radius: 999px;
+        background: var(--accent, #cd6e58);
+        color: #fff3ef;
+        font-family: "Inter", sans-serif;
+        font-weight: 700;
+        font-size: 30px;
+        letter-spacing: 0.02em;
+        opacity: 0;
+      }
+      #root .seam {
+        position: absolute;
+        left: 0;
+        top: 862px;
+        width: 1080px;
+        height: 106px;
+        display: grid;
+        place-items: center;
+      }
+      #root .uw-word {
+        position: absolute;
+        font-family: "Archivo Black", sans-serif;
+        font-size: 76px;
+        line-height: 1;
+        color: var(--ink, #111111);
+        opacity: 0;
+        white-space: nowrap;
+      }
+    </style>
+  </head>
+  <body>
+    <div
+      id="root"
+      data-composition-id="ugc-wordmark"
+      data-start="0"
+      data-duration="3.5"
+      data-width="1080"
+      data-height="1920"
+    >
+      <div class="stage">
+        <div id="uw-row" class="wordmark"></div>
+        <span id="uw-rule" class="rule"></span>
+        <span id="uw-pill" class="pill">motion template</span>
+      </div>
+      <div id="uw-seam" class="seam"></div>
+    </div>
+
+    <script>
+      (() => {
+        const DUR = 3.5;
+        const scene = document.querySelector('[data-composition-id="ugc-wordmark"]');
+        const V =
+          (window.__hyperframes && window.__hyperframes.getVariables
+            ? window.__hyperframes.getVariables()
+            : null) || {};
+        const wordmark = V.wordmark || "OPERATOR";
+        const pillText = V.pill || "motion template";
+        const capSpec = V.captions || "Here's@0.15|the whole@1.0|system@2.0";
+
+        scene.querySelector("#uw-pill").textContent = pillText;
+
+        // Letters — built synchronously at init so the timeline can address them.
+        const row = scene.querySelector("#uw-row");
+        wordmark.split("").forEach((ch) => {
+          const s = document.createElement("span");
+          s.className = "uw-ltr";
+          s.textContent = ch === " " ? " " : ch;
+          row.appendChild(s);
+        });
+        const letters = scene.querySelectorAll(".uw-ltr");
+
+        // Captions: "text@seconds" pairs, pipe-separated.
+        const seam = scene.querySelector("#uw-seam");
+        const caps = capSpec
+          .split("|")
+          .map((chunk) => {
+            const at = chunk.lastIndexOf("@");
+            if (at < 0) return null;
+            const t = parseFloat(chunk.slice(at + 1));
+            if (!isFinite(t)) return null;
+            return { text: chunk.slice(0, at), t };
+          })
+          .filter(Boolean);
+        caps.forEach((c) => {
+          const d = document.createElement("div");
+          d.className = "uw-word";
+          d.textContent = c.text;
+          seam.appendChild(d);
+          c.el = d;
+        });
+
+        window.__timelines = window.__timelines || {};
+        const tl = gsap.timeline({ paused: true });
+
+        // waterfall-entry — arrival opacity is BINARY, never a fade.
+        tl.set(letters, { opacity: 1 }, 0);
+        tl.fromTo(
+          letters,
+          { y: 130 },
+          { y: 0, duration: 0.72, ease: "power3.out", stagger: 0.045 },
+          0,
+        );
+
+        tl.fromTo("#uw-rule", { scaleX: 0 }, { scaleX: 1, duration: 0.55, ease: "power3.out" }, 0.5);
+
+        // spring-pop-entrance
+        tl.set("#uw-pill", { opacity: 1 }, 0.78);
+        tl.fromTo("#uw-pill", { scale: 0.4 }, { scale: 1, duration: 0.6, ease: "back.out(2.2)" }, 0.78);
+
+        caps.forEach((c, i) => {
+          const off = i < caps.length - 1 ? caps[i + 1].t : DUR;
+          tl.set(c.el, { opacity: 1 }, c.t);
+          tl.fromTo(c.el, { y: 14 }, { y: 0, duration: 0.22, ease: "power2.out" }, c.t);
+          if (off < DUR) tl.set(c.el, { opacity: 0 }, off);
+        });
+
+        window.__timelines["ugc-wordmark"] = tl;
+      })();
+    </script>
+  </body>
+</html>

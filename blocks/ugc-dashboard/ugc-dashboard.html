@@ -1,0 +1,338 @@
+<!-- hyperframes-registry-item: ugc-dashboard -->
+<!doctype html>
+<html
+  lang="en"
+  data-composition-variables='[
+    {"id":"deltaTo","type":"number","label":"Panel A headline %","default":248},
+    {"id":"valueTo","type":"number","label":"Panel B headline $","default":46250},
+    {"id":"trend","type":"string","label":"Trend heights 0..1","default":"0.12,0.24,0.21,0.45,0.56,0.79,0.88"},
+    {"id":"bars","type":"string","label":"Bar heights 0..1","default":"0.34,0.52,0.44,0.7,0.86,1.0"},
+    {"id":"caption","type":"string","label":"Caption","default":"and a clean summary"}
+  ]'
+>
+  <head>
+    <meta charset="UTF-8" />
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+<style>
+        #root {
+          position: absolute;
+          inset: 0;
+          --ink: #111111;
+          --muted: #8a8580;
+          --border: #eceae6;
+          --ok: #12a150;
+        }
+        .fill {
+          position: absolute;
+          inset: 0;
+          background: #fdfdfd;
+        }
+        .panel {
+          position: absolute;
+          top: 452px;
+          width: 470px;
+          height: 420px;
+          background: #fff;
+          border: 1.5px solid var(--border);
+          border-radius: 28px;
+          box-shadow: 0 14px 36px rgba(17, 17, 17, 0.09);
+          padding: 28px 28px 24px;
+          opacity: 0;
+        }
+        #ud-pa {
+          left: 60px;
+        }
+        #ud-pb {
+          left: 550px;
+        }
+        .head {
+          display: flex;
+          align-items: center;
+          gap: 14px;
+        }
+        .head .sq {
+          display: block;
+          width: 34px;
+          height: 34px;
+          border-radius: 10px;
+          flex: none;
+        }
+        .head .t {
+          display: block;
+          font-family: "Inter", sans-serif;
+          font-weight: 700;
+          font-size: 28px;
+          color: var(--ink);
+        }
+        .big {
+          display: block;
+          font-family: "Inter", sans-serif;
+          font-weight: 900;
+          font-size: 60px;
+          line-height: 1;
+          color: var(--ink);
+          margin-top: 22px;
+          font-variant-numeric: tabular-nums;
+        }
+        .cap {
+          display: block;
+          font-family: "Inter", sans-serif;
+          font-weight: 700;
+          font-size: 23px;
+          color: var(--ok);
+          margin-top: 8px;
+        }
+        .plot {
+          position: absolute;
+          left: 28px;
+          right: 28px;
+          bottom: 26px;
+          height: 172px;
+        }
+        .plot svg {
+          display: block;
+          width: 100%;
+          height: 172px;
+        }
+        .bars {
+          position: absolute;
+          left: 28px;
+          right: 28px;
+          bottom: 26px;
+          height: 172px;
+          display: flex;
+          align-items: flex-end;
+          gap: 14px;
+        }
+        .bars i {
+          display: block;
+          flex: 1;
+          border-radius: 8px 8px 4px 4px;
+          background: #e8a317;
+          transform-origin: 50% 100%;
+        }
+        .bcap {
+          position: absolute;
+          left: 0;
+          top: 1180px;
+          width: 1080px;
+          text-align: center;
+          font-family: "Playfair Display", serif;
+          font-weight: 900;
+          font-style: italic;
+          font-size: 78px;
+          text-transform: uppercase;
+          color: var(--ink);
+          -webkit-text-stroke: 11px #fdfdfd;
+          paint-order: stroke fill;
+          opacity: 0;
+        }
+      </style>
+    <style>
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      html, body { background: #FDFDFD; overflow: hidden; }
+      body { width: 1080px; height: 1920px; }
+    </style>
+  </head>
+  <body>
+    <div
+      id="root"
+      data-composition-id="ugc-dashboard"
+      data-start="0"
+      data-duration="5.5"
+      data-width="1080"
+      data-height="1920"
+    >
+        <div class="fill"></div>
+
+        <!-- Panel A — trend -->
+        <div id="ud-pa" class="panel">
+          <div class="head">
+            <span class="sq" style="background: #7c5ce6"></span>
+            <span class="t">Marketing</span>
+          </div>
+          <span id="ud-delta" class="big">0%</span>
+          <span class="cap">vs. last quarter</span>
+          <div class="plot">
+            <svg viewBox="0 0 400 172" preserveAspectRatio="none" fill="none">
+              <path id="ud-area" fill="#7C5CE6" fill-opacity="0.12" />
+              <path
+                id="ud-line"
+                stroke="#7C5CE6"
+                stroke-width="5"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              />
+            </svg>
+          </div>
+        </div>
+
+        <!-- Panel B — volume -->
+        <div id="ud-pb" class="panel">
+          <div class="head">
+            <span class="sq" style="background: #e8a317"></span>
+            <span class="t">Finance</span>
+          </div>
+          <span id="ud-value" class="big">$0</span>
+          <span class="cap">collected this month</span>
+          <div id="ud-bars" class="bars"></div>
+        </div>
+
+        <div id="ud-cap" class="bcap">and a clean summary</div>
+      </div>
+<script>
+        (() => {
+          
+          // ---- props: declared on <html>, overridable per mount via data-variable-values ----
+          const V =
+            (window.__hyperframes && window.__hyperframes.getVariables
+              ? window.__hyperframes.getVariables()
+              : null) || {};
+          const rows = (s, n) =>
+            String(s).split(",").map((r) => r.split(":").map((x) => x.trim())).filter((r) => r.length >= n);
+          const caps = (s) =>
+            String(s)
+              .split("|")
+              .map((c) => {
+                const i = c.lastIndexOf("@");
+                if (i < 0) return null;
+                const t = parseFloat(c.slice(i + 1));
+                return isFinite(t) ? { text: c.slice(0, i), t } : null;
+              })
+              .filter(Boolean);
+          const nums = (v, d) => {
+            const a = String(v).split(",").map(Number).filter((n) => isFinite(n));
+            return a.length ? a : d;
+          };
+          const DELTA_TO = isFinite(+V.deltaTo) ? +V.deltaTo : 248;
+          const VALUE_TO = isFinite(+V.valueTo) ? +V.valueTo : 46250;
+          const BARS = nums(V.bars, [0.34, 0.52, 0.44, 0.7, 0.86, 1.0]);
+          const TREND = nums(V.trend, [0.12, 0.24, 0.21, 0.45, 0.56, 0.79, 0.88]);
+          const CAPTION_AT = 2.45;
+
+          // Plot geometry in viewBox units. Nothing here is measured from the DOM —
+          // the renderer seeks non-linearly, so measured geometry would be
+          // seek-order dependent. Fixed coordinates are always reproducible.
+          const VW = 400,
+            VH = 172,
+            PAD = 6;
+          const pts = TREND.map((v, i) => [
+            PAD + (i / (TREND.length - 1)) * (VW - PAD * 2),
+            VH - PAD - v * (VH - PAD * 3),
+          ]);
+          const lineD = pts.map((p, i) => (i ? "L" : "M") + p[0] + " " + p[1]).join(" ");
+          const areaD = lineD + " L" + pts[pts.length - 1][0] + " " + (VH - PAD) +
+            " L" + pts[0][0] + " " + (VH - PAD) + " Z";
+          // Polyline length = sum of segment lengths. Exact, and no getTotalLength().
+          const pathLen = pts.reduce(
+            (acc, p, i) => (i ? acc + Math.hypot(p[0] - pts[i - 1][0], p[1] - pts[i - 1][1]) : 0),
+            0,
+          );
+
+          const scene = document.querySelector('[data-composition-id="ugc-dashboard"]');
+          const deltaEl = scene.querySelector("#ud-delta");
+          const valueEl = scene.querySelector("#ud-value");
+          const barHost = scene.querySelector("#ud-bars");
+          scene.querySelector("#ud-cap").textContent = V.caption || "and a clean summary";
+
+          BARS.forEach((h) => {
+            const b = document.createElement("i");
+            b.style.height = Math.round(h * 172) + "px";
+            barHost.appendChild(b);
+          });
+          const bars = barHost.querySelectorAll("i");
+
+          const money = (n) => "$" + Math.round(n).toLocaleString("en-US");
+
+          window.__timelines = window.__timelines || {};
+          const tl = gsap.timeline({ paused: true });
+
+          deltaEl.textContent = "+0%";
+          valueEl.textContent = "$0";
+
+          /* ---------- Panel A ---------- */
+          tl.set("#ud-pa", { opacity: 1 }, 0);
+          tl.fromTo(
+            "#ud-pa",
+            { scale: 0.8, y: 40 },
+            { scale: 1, y: 0, duration: 0.6, ease: "back.out(1.9)" },
+            0,
+          );
+
+          // svg-path-draw: dashoffset tweens to 0 over the analytic polyline length.
+          const line = scene.querySelector("#ud-line");
+          line.setAttribute("d", lineD);
+          line.setAttribute("stroke-dasharray", pathLen);
+          scene.querySelector("#ud-area").setAttribute("d", areaD);
+          tl.fromTo(
+            line,
+            { strokeDashoffset: pathLen },
+            { strokeDashoffset: 0, duration: 1.05, ease: "power2.out" },
+            0.38,
+          );
+          tl.fromTo(
+            "#ud-area",
+            { opacity: 0 },
+            { opacity: 1, duration: 0.6, ease: "power2.out" },
+            0.7,
+          );
+
+          // counting-dynamic-scale
+          const d = { v: 0 };
+          tl.to(
+            d,
+            {
+              v: DELTA_TO,
+              duration: 1.15,
+              ease: "power2.out",
+              onUpdate: () => {
+                deltaEl.textContent = "+" + Math.round(d.v) + "%";
+              },
+            },
+            0.45,
+          );
+
+          /* ---------- Panel B ---------- */
+          tl.set("#ud-pb", { opacity: 1 }, 1.25);
+          tl.fromTo(
+            "#ud-pb",
+            { scale: 0.8, y: 40 },
+            { scale: 1, y: 0, duration: 0.6, ease: "back.out(1.9)" },
+            1.25,
+          );
+
+          // stat-bars-and-fills: scaleY stagger off a shared baseline.
+          tl.set(bars, { scaleY: 0 }, 0);
+          tl.to(
+            bars,
+            { scaleY: 1, duration: 0.55, ease: "back.out(1.7)", stagger: 0.075 },
+            1.68,
+          );
+
+          const m = { v: 0 };
+          tl.to(
+            m,
+            {
+              v: VALUE_TO,
+              duration: 1.3,
+              ease: "power2.out",
+              onUpdate: () => {
+                valueEl.textContent = money(m.v);
+              },
+            },
+            1.75,
+          );
+
+          tl.set("#ud-cap", { opacity: 1 }, CAPTION_AT);
+          tl.fromTo(
+            "#ud-cap",
+            { y: 18, scale: 0.96 },
+            { y: 0, scale: 1, duration: 0.3, ease: "power3.out" },
+            CAPTION_AT,
+          );
+
+          window.__timelines["ugc-dashboard"] = tl;
+        })();
+      </script>
+  </body>
+</html>

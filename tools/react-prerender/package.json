@@ -1,0 +1,17 @@
+{
+  "name": "ugc-react-prerender",
+  "private": true,
+  "type": "module",
+  "description": "Build-time React -> static SVG for HyperFrames blocks. React never ships to the renderer.",
+  "scripts": {
+    "build": "node build-chart.mjs"
+  },
+  "dependencies": {
+    "@visx/curve": "^3.3.0",
+    "@visx/scale": "^3.5.0",
+    "@visx/shape": "^3.5.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "svg-path-properties": "^2.0.2"
+  }
+}

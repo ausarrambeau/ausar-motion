@@ -1,0 +1,23 @@
+{
+  "$schema": "https://hyperframes.heygen.com/schema/registry-item.json",
+  "name": "ugc-wordmark",
+  "type": "hyperframes:block",
+  "title": "UGC \u2014 Wordmark Hit",
+  "description": "Letters cascade up into a centred lockup with a drawn rule and an accent pill \u2014 the opening brand or topic hit",
+  "tags": [
+    "ugc-split",
+    "title-card"
+  ],
+  "dimensions": {
+    "width": 1080,
+    "height": 1920
+  },
+  "duration": 3.5,
+  "files": [
+    {
+      "path": "ugc-wordmark.html",
+      "target": "compositions/ugc-wordmark.html",
+      "type": "hyperframes:composition"
+    }
+  ]
+}

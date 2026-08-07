@@ -1,0 +1,24 @@
+{
+  "$schema": "https://hyperframes.heygen.com/schema/registry-item.json",
+  "name": "ugc-react-chart",
+  "type": "hyperframes:block",
+  "title": "UGC \u2014 Prerendered React Chart",
+  "description": "A visx/React chart prerendered to static SVG at build time, then drawn on with GSAP \u2014 React's layout engine without its runtime",
+  "tags": [
+    "ugc-split",
+    "data-viz",
+    "react"
+  ],
+  "dimensions": {
+    "width": 1080,
+    "height": 1920
+  },
+  "duration": 5.0,
+  "files": [
+    {
+      "path": "ugc-react-chart.html",
+      "target": "compositions/ugc-react-chart.html",
+      "type": "hyperframes:composition"
+    }
+  ]
+}

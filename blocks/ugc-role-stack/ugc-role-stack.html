@@ -1,0 +1,257 @@
+<!-- hyperframes-registry-item: ugc-role-stack -->
+<!doctype html>
+<html
+  lang="en"
+  data-composition-variables='[
+    {"id":"roles","type":"string","label":"Roles (title:sub:glyph:color)","default":"Sales:pipeline · outreach:$:#12A150,Marketing:campaigns · copy:◍:#7C5CE6,Finance:books · forecasts:▤:#B8800A"},
+    {"id":"captions","type":"string","label":"Seam captions (text@seconds)","default":"one for@0.25|every job@2.3"}
+  ]'
+>
+  <head>
+    <meta charset="UTF-8" />
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+<style>
+        #root {
+          position: absolute;
+          inset: 0;
+          --ink: #111111;
+          --muted: #8a8580;
+          --border: #eceae6;
+        }
+        /* Split shell — no fill, the head card shows through underneath. */
+        .slot {
+          position: absolute;
+          left: 300px;
+          top: 318px;
+          width: 480px;
+          height: 340px;
+        }
+        .card {
+          position: absolute;
+          inset: 0;
+          background: #fff;
+          border: 1.5px solid var(--border);
+          border-radius: 30px;
+          box-shadow: 0 12px 34px rgba(17, 17, 17, 0.09);
+          padding: 34px;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+          gap: 20px;
+          opacity: 0;
+        }
+        .card .ico {
+          display: grid;
+          place-items: center;
+          width: 108px;
+          height: 108px;
+          border-radius: 28px;
+        }
+        .card .ico span {
+          display: block;
+          font-family: "Inter", sans-serif;
+          font-weight: 900;
+          font-size: 46px;
+          color: #fff;
+          line-height: 1;
+        }
+        .card .title {
+          display: block;
+          font-family: "Inter", sans-serif;
+          font-weight: 700;
+          font-size: 42px;
+          color: var(--ink);
+        }
+        .card .sub {
+          display: block;
+          font-family: "Inter", sans-serif;
+          font-weight: 400;
+          font-size: 26px;
+          color: var(--muted);
+        }
+        .dot {
+          position: absolute;
+          right: 26px;
+          top: 26px;
+          width: 22px;
+          height: 22px;
+          border-radius: 50%;
+        }
+        /* Progress rail under the slot. */
+        .rail {
+          position: absolute;
+          left: 300px;
+          top: 700px;
+          width: 480px;
+          height: 10px;
+          display: flex;
+          gap: 12px;
+        }
+        .seg {
+          flex: 1;
+          height: 10px;
+          border-radius: 5px;
+          background: #e6e2dd;
+          overflow: hidden;
+        }
+        .seg i {
+          display: block;
+          width: 100%;
+          height: 10px;
+          border-radius: 5px;
+          background: #12a150;
+          transform-origin: 0% 50%;
+        }
+        .seam {
+          position: absolute;
+          left: 0;
+          top: 862px;
+          width: 1080px;
+          height: 106px;
+          display: grid;
+          place-items: center;
+        }
+        .word {
+          position: absolute;
+          font-family: "Archivo Black", sans-serif;
+          font-size: 76px;
+          line-height: 1;
+          color: var(--ink);
+          opacity: 0;
+          white-space: nowrap;
+        }
+      </style>
+    <style>
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      html, body { background: transparent; overflow: hidden; }
+      body { width: 1080px; height: 1920px; }
+    </style>
+  </head>
+  <body>
+    <div
+      id="root"
+      data-composition-id="ugc-role-stack"
+      data-start="0"
+      data-duration="4.5"
+      data-width="1080"
+      data-height="1920"
+    >
+        <div id="ur-slot" class="slot"></div>
+
+        <div class="rail">
+          <span class="seg"><i></i></span>
+          <span class="seg"><i></i></span>
+          <span class="seg"><i></i></span>
+        </div>
+
+        <div id="ur-seam" class="seam"></div>
+      </div>
+<script>
+        (() => {
+          
+          // ---- props: declared on <html>, overridable per mount via data-variable-values ----
+          const V =
+            (window.__hyperframes && window.__hyperframes.getVariables
+              ? window.__hyperframes.getVariables()
+              : null) || {};
+          const rows = (s, n) =>
+            String(s).split(",").map((r) => r.split(":").map((x) => x.trim())).filter((r) => r.length >= n);
+          const caps = (s) =>
+            String(s)
+              .split("|")
+              .map((c) => {
+                const i = c.lastIndexOf("@");
+                if (i < 0) return null;
+                const t = parseFloat(c.slice(i + 1));
+                return isFinite(t) ? { text: c.slice(0, i), t } : null;
+              })
+              .filter(Boolean);
+          const ROLES = rows(
+            V.roles || "Sales:pipeline · outreach:$:#12A150,Marketing:campaigns · copy:◍:#7C5CE6,Finance:books · forecasts:▤:#B8800A", 4,
+          ).map((r) => ({ title: r[0], sub: r[1], glyph: r[2], color: r[3] }));
+          const CAPS = caps(V.captions || "one for@0.25|every job@2.3");
+          const CAPTIONS = CAPS.map((c) => c.t);
+
+          const DUR = 4.5;
+          const scene = document.querySelector('[data-composition-id="ugc-role-stack"]');
+          const slot = scene.querySelector("#ur-slot");
+          const segs = scene.querySelectorAll(".seg i");
+
+          // All three cards live in the DOM from t=0 at opacity 0 — no conditional rendering.
+          const cards = ROLES.map((r) => {
+            const el = document.createElement("div");
+            el.className = "card";
+            // The chain deliberately hands off card-to-card at ONE screen centre,
+            // so the brief overlap during each swap is the effect, not a defect.
+            el.setAttribute("data-layout-allow-overlap", "");
+            el.innerHTML =
+              '<span class="dot" style="background:' +
+              r.color +
+              '"></span>' +
+              '<span class="ico" style="background:' +
+              r.color +
+              '"><span>' +
+              r.glyph +
+              "</span></span>" +
+              '<span class="title">' +
+              r.title +
+              "</span>" +
+              '<span class="sub">' +
+              r.sub +
+              "</span>";
+            slot.appendChild(el);
+            return el;
+          });
+
+          const seamEl = scene.querySelector("#ur-seam");
+          CAPS.forEach((c) => {
+            const d = document.createElement("div");
+            d.className = "word";
+            d.textContent = c.text;
+            seamEl.appendChild(d);
+          });
+          const words = scene.querySelectorAll(".word");
+
+          window.__timelines = window.__timelines || {};
+          const tl = gsap.timeline({ paused: true });
+
+          // Rail starts empty.
+          tl.set(segs, { scaleX: 0 }, 0);
+
+          // titlecard-reveal card chain, seamed by scale-swap-transition at one screen centre.
+          const HOLD = (DUR - 0.2) / ROLES.length;
+          cards.forEach((c, i) => {
+            const at = 0.15 + i * HOLD;
+
+            tl.set(c, { opacity: 1 }, at);
+            tl.fromTo(
+              c,
+              { scale: 0.72 },
+              { scale: 1, duration: 0.52, ease: "back.out(2)" },
+              at,
+            );
+
+            // Its rail segment fills as it lands.
+            tl.to(segs[i], { scaleX: 1, duration: 0.4, ease: "power2.out" }, at + 0.1);
+
+            // Exit: shrink away just before the next one pops (last card holds to the end).
+            if (i < cards.length - 1) {
+              const out = 0.15 + (i + 1) * HOLD;
+              tl.to(c, { scale: 0.82, opacity: 0, duration: 0.26, ease: "power2.in" }, out - 0.2);
+            }
+          });
+
+          words.forEach((w, i) => {
+            const on = CAPTIONS[i];
+            const off = i < CAPTIONS.length - 1 ? CAPTIONS[i + 1] : DUR;
+            tl.set(w, { opacity: 1 }, on);
+            tl.fromTo(w, { y: 14 }, { y: 0, duration: 0.22, ease: "power2.out" }, on);
+            if (off < DUR) tl.set(w, { opacity: 0 }, off);
+          });
+
+          window.__timelines["ugc-role-stack"] = tl;
+        })();
+      </script>
+  </body>
+</html>

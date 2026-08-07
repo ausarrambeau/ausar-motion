@@ -1,0 +1,353 @@
+<!-- hyperframes-registry-item: ugc-install-card -->
+<!doctype html>
+<html
+  lang="en"
+  data-composition-variables='[
+    {"id":"appName","type":"string","label":"App name (types in)","default":"Operator Pack"},
+    {"id":"subLabel","type":"string","label":"Sub label","default":"back-office tasks"},
+    {"id":"labelBusy","type":"string","label":"Busy label","default":"Installing…"},
+    {"id":"labelDone","type":"string","label":"Done label","default":"Installed"},
+    {"id":"caption","type":"string","label":"Caption","default":"you install it once"}
+  ]'
+>
+  <head>
+    <meta charset="UTF-8" />
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+<style>
+        #root {
+          position: absolute;
+          inset: 0;
+          --ink: #111111;
+          --muted: #8a8580;
+          --accent: #cd6e58;
+          --border: #eceae6;
+          --ok: #12a150;
+        }
+        .fill {
+          position: absolute;
+          inset: 0;
+          background: #fdfdfd;
+        }
+        .card {
+          position: absolute;
+          left: 190px;
+          top: 452px;
+          width: 700px;
+          height: 416px;
+          background: #fff;
+          border: 1.5px solid var(--border);
+          border-radius: 34px;
+          box-shadow: 0 16px 40px rgba(17, 17, 17, 0.1);
+          padding: 44px 44px 40px;
+          opacity: 0;
+        }
+        .row {
+          display: flex;
+          align-items: center;
+          gap: 24px;
+        }
+        .appico {
+          display: grid;
+          place-items: center;
+          width: 88px;
+          height: 88px;
+          border-radius: 24px;
+          background: var(--accent);
+          flex: none;
+        }
+        .appico span {
+          display: block;
+          font-family: "Archivo Black", sans-serif;
+          font-size: 40px;
+          color: #fff;
+          line-height: 1;
+        }
+        .meta {
+          flex: 1;
+          min-width: 0;
+        }
+        .name {
+          display: block;
+          font-family: "Inter", sans-serif;
+          font-weight: 700;
+          font-size: 40px;
+          color: var(--ink);
+          line-height: 1.15;
+          white-space: nowrap;
+        }
+        .sub {
+          display: block;
+          font-family: "Inter", sans-serif;
+          font-size: 25px;
+          color: var(--muted);
+          margin-top: 6px;
+        }
+        .status {
+          position: absolute;
+          right: 40px;
+          top: 40px;
+          width: 44px;
+          height: 44px;
+        }
+        .status .pending {
+          position: absolute;
+          inset: 0;
+          border-radius: 50%;
+          background: #ddd8d2;
+        }
+        .status .done {
+          position: absolute;
+          inset: 0;
+          border-radius: 50%;
+          background: var(--ok);
+          display: grid;
+          place-items: center;
+          opacity: 0;
+        }
+        .status .done svg {
+          display: block;
+        }
+        .barwrap {
+          position: absolute;
+          left: 44px;
+          right: 44px;
+          bottom: 92px;
+        }
+        .barlabels {
+          display: flex;
+          justify-content: space-between;
+          align-items: baseline;
+          margin-bottom: 16px;
+        }
+        .barlabels > span {
+          display: block;
+          font-family: "Inter", sans-serif;
+          font-weight: 700;
+          font-size: 26px;
+          color: var(--muted);
+          font-variant-numeric: tabular-nums;
+        }
+        /* Two stacked labels crossfaded by tl.set — seek-safe in both directions,
+           unlike a tl.call() that only fires on a forward pass. */
+        .statewrap {
+          position: relative;
+          display: block;
+          height: 32px;
+          min-width: 260px;
+        }
+        .state {
+          position: absolute;
+          left: 0;
+          top: 0;
+          font-family: "Inter", sans-serif;
+          font-weight: 700;
+          font-size: 26px;
+          color: var(--muted);
+          white-space: nowrap;
+        }
+        .done-lbl {
+          color: var(--ok);
+          opacity: 0;
+        }
+        .track {
+          width: 100%;
+          height: 16px;
+          border-radius: 8px;
+          background: #ece8e3;
+          overflow: hidden;
+        }
+        .track i {
+          display: block;
+          width: 100%;
+          height: 16px;
+          border-radius: 8px;
+          background: var(--accent);
+          transform-origin: 0% 50%;
+        }
+        .bcap {
+          position: absolute;
+          left: 0;
+          top: 1180px;
+          width: 1080px;
+          text-align: center;
+          font-family: "Playfair Display", serif;
+          font-weight: 900;
+          font-style: italic;
+          font-size: 78px;
+          text-transform: uppercase;
+          color: var(--ink);
+          -webkit-text-stroke: 11px #fdfdfd;
+          paint-order: stroke fill;
+          opacity: 0;
+        }
+      </style>
+    <style>
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      html, body { background: #FDFDFD; overflow: hidden; }
+      body { width: 1080px; height: 1920px; }
+    </style>
+  </head>
+  <body>
+    <div
+      id="root"
+      data-composition-id="ugc-install-card"
+      data-start="0"
+      data-duration="4.5"
+      data-width="1080"
+      data-height="1920"
+    >
+        <div class="fill"></div>
+
+        <div id="ui-card" class="card">
+          <div class="status">
+            <span class="pending"></span>
+            <span id="ui-done" class="done">
+              <svg width="24" height="24" viewBox="0 0 16 16">
+                <path
+                  d="M3.5 8.4l3 3 6-6.5"
+                  stroke="#fff"
+                  stroke-width="2.6"
+                  fill="none"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                />
+              </svg>
+            </span>
+          </div>
+
+          <div class="row">
+            <span class="appico"><span id="ui-initial">O</span></span>
+            <span class="meta">
+              <span id="ui-name" class="name"></span>
+              <span id="ui-sub" class="sub">back-office tasks</span>
+            </span>
+          </div>
+
+          <div class="barwrap">
+            <div class="barlabels">
+              <span class="statewrap">
+                <span id="ui-busy" class="state">Installing…</span>
+                <span id="ui-ok" class="state done-lbl">Installed</span>
+              </span>
+              <span id="ui-pct">0%</span>
+            </div>
+            <span class="track"><i id="ui-fill"></i></span>
+          </div>
+        </div>
+
+        <div id="ui-cap" class="bcap">you install it once</div>
+      </div>
+<script>
+        (() => {
+          
+          // ---- props: declared on <html>, overridable per mount via data-variable-values ----
+          const V =
+            (window.__hyperframes && window.__hyperframes.getVariables
+              ? window.__hyperframes.getVariables()
+              : null) || {};
+          const rows = (s, n) =>
+            String(s).split(",").map((r) => r.split(":").map((x) => x.trim())).filter((r) => r.length >= n);
+          const caps = (s) =>
+            String(s)
+              .split("|")
+              .map((c) => {
+                const i = c.lastIndexOf("@");
+                if (i < 0) return null;
+                const t = parseFloat(c.slice(i + 1));
+                return isFinite(t) ? { text: c.slice(0, i), t } : null;
+              })
+              .filter(Boolean);
+          const APP_NAME = V.appName || "Operator Pack";
+          const LABEL_BUSY = V.labelBusy || "Installing…";
+          const LABEL_DONE = V.labelDone || "Installed";
+          const CAPTION_AT = 1.5;
+
+          const scene = document.querySelector('[data-composition-id="ugc-install-card"]');
+          const nameEl = scene.querySelector("#ui-name");
+          const pctEl = scene.querySelector("#ui-pct");
+          scene.querySelector("#ui-busy").textContent = LABEL_BUSY;
+          scene.querySelector("#ui-ok").textContent = LABEL_DONE;
+          scene.querySelector("#ui-cap").textContent = V.caption || "you install it once";
+          scene.querySelector("#ui-sub").textContent = V.subLabel || "back-office tasks";
+          scene.querySelector("#ui-initial").textContent = APP_NAME.charAt(0).toUpperCase();
+
+          window.__timelines = window.__timelines || {};
+          const tl = gsap.timeline({ paused: true });
+
+          // Card arrives.
+          tl.set("#ui-card", { opacity: 1 }, 0);
+          tl.fromTo(
+            "#ui-card",
+            { scale: 0.68, y: 34 },
+            { scale: 1, y: 0, duration: 0.62, ease: "back.out(2)" },
+            0,
+          );
+
+          // discrete-text-sequence: the name types itself, driven by a seek-safe proxy.
+          const typer = { n: 0 };
+          nameEl.textContent = "";
+          tl.to(
+            typer,
+            {
+              n: APP_NAME.length,
+              duration: 0.66,
+              ease: "none",
+              onUpdate: () => {
+                nameEl.textContent = APP_NAME.slice(0, Math.round(typer.n));
+              },
+            },
+            0.34,
+          );
+
+          // stat-bars-and-fills: the fill and the readout are two tweens sharing ONE
+          // timeline position, duration and ease — so they can never drift apart.
+          const FILL_AT = 1.02,
+            FILL_DUR = 1.75,
+            FILL_EASE = "power1.inOut";
+          tl.fromTo(
+            "#ui-fill",
+            { scaleX: 0 },
+            { scaleX: 1, duration: FILL_DUR, ease: FILL_EASE },
+            FILL_AT,
+          );
+          const prog = { v: 0 };
+          tl.to(
+            prog,
+            {
+              v: 100,
+              duration: FILL_DUR,
+              ease: FILL_EASE,
+              onUpdate: () => {
+                pctEl.textContent = Math.round(prog.v) + "%";
+              },
+            },
+            FILL_AT,
+          );
+
+          // Completion: status flips, label swaps, card takes a press-spring settle.
+          tl.set("#ui-done", { opacity: 1 }, 2.82);
+          tl.fromTo(
+            "#ui-done",
+            { scale: 0 },
+            { scale: 1, duration: 0.38, ease: "back.out(3)" },
+            2.82,
+          );
+          tl.set("#ui-busy", { opacity: 0 }, 2.82);
+          tl.set("#ui-ok", { opacity: 1 }, 2.82);
+          // physics-press-reaction: compress then recover.
+          tl.to("#ui-card", { scale: 0.972, duration: 0.1, ease: "power2.in" }, 2.82);
+          tl.to("#ui-card", { scale: 1, duration: 0.42, ease: "back.out(3)" }, 2.92);
+
+          tl.set("#ui-cap", { opacity: 1 }, CAPTION_AT);
+          tl.fromTo(
+            "#ui-cap",
+            { y: 18, scale: 0.96 },
+            { y: 0, scale: 1, duration: 0.3, ease: "power3.out" },
+            CAPTION_AT,
+          );
+
+          window.__timelines["ugc-install-card"] = tl;
+        })();
+      </script>
+  </body>
+</html>

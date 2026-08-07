@@ -1,0 +1,23 @@
+{
+  "$schema": "https://hyperframes.heygen.com/schema/registry-item.json",
+  "name": "ugc-dashboard",
+  "type": "hyperframes:block",
+  "title": "UGC \u2014 Dashboard Payoff",
+  "description": "Two panels arrive staggered: a line chart draws its path and a bar column grows, both under counting headline numbers",
+  "tags": [
+    "ugc-split",
+    "data-viz"
+  ],
+  "dimensions": {
+    "width": 1080,
+    "height": 1920
+  },
+  "duration": 5.5,
+  "files": [
+    {
+      "path": "ugc-dashboard.html",
+      "target": "compositions/ugc-dashboard.html",
+      "type": "hyperframes:composition"
+    }
+  ]
+}

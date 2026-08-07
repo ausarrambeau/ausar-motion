@@ -1,0 +1,43 @@
+{
+  "$schema": "https://hyperframes.heygen.com/schema/registry.json",
+  "name": "ausar-motion",
+  "homepage": "https://github.com/ausarrambeau/ausar-motion",
+  "items": [
+    {
+      "name": "ugc-split-shell",
+      "type": "hyperframes:component"
+    },
+    {
+      "name": "ugc-wordmark",
+      "type": "hyperframes:block"
+    },
+    {
+      "name": "ugc-folder-fan",
+      "type": "hyperframes:block"
+    },
+    {
+      "name": "ugc-orbit-ring",
+      "type": "hyperframes:block"
+    },
+    {
+      "name": "ugc-color-flood",
+      "type": "hyperframes:block"
+    },
+    {
+      "name": "ugc-role-stack",
+      "type": "hyperframes:block"
+    },
+    {
+      "name": "ugc-install-card",
+      "type": "hyperframes:block"
+    },
+    {
+      "name": "ugc-dashboard",
+      "type": "hyperframes:block"
+    },
+    {
+      "name": "ugc-react-chart",
+      "type": "hyperframes:block"
+    }
+  ]
+}

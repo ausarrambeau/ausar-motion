@@ -1,0 +1,23 @@
+{
+  "$schema": "https://hyperframes.heygen.com/schema/registry-item.json",
+  "name": "ugc-role-stack",
+  "type": "hyperframes:block",
+  "title": "UGC \u2014 Role Card Stack",
+  "description": "One card slot cycles through N roles at a single screen centre, seamed by scale-swaps, under a filling progress rail",
+  "tags": [
+    "ugc-split",
+    "title-card"
+  ],
+  "dimensions": {
+    "width": 1080,
+    "height": 1920
+  },
+  "duration": 4.5,
+  "files": [
+    {
+      "path": "ugc-role-stack.html",
+      "target": "compositions/ugc-role-stack.html",
+      "type": "hyperframes:composition"
+    }
+  ]
+}

@@ -1,0 +1,23 @@
+{
+  "$schema": "https://hyperframes.heygen.com/schema/registry-item.json",
+  "name": "ugc-folder-fan",
+  "type": "hyperframes:block",
+  "title": "UGC \u2014 Folder Fan-Out",
+  "description": "Labelled file chips fan out of a folder along an arc in a staggered cascade \u2014 enumerates what is inside at a glance",
+  "tags": [
+    "ugc-split",
+    "title-card"
+  ],
+  "dimensions": {
+    "width": 1080,
+    "height": 1920
+  },
+  "duration": 4.5,
+  "files": [
+    {
+      "path": "ugc-folder-fan.html",
+      "target": "compositions/ugc-folder-fan.html",
+      "type": "hyperframes:composition"
+    }
+  ]
+}

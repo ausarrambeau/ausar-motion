@@ -1,0 +1,94 @@
+<!-- hyperframes-registry-item: ugc-split-shell -->
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <style>
+      *,
+      *::before,
+      *::after {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      body {
+        background: transparent;
+        overflow: hidden;
+      }
+    </style>
+  </head>
+  <body>
+    <!--
+      ugc-split-shell — the HOST-level shell for the split UGC format.
+
+      This is a snippet, not a block: paste its CSS into your index.html <style>
+      and its markup into your root composition. Every ugc-* block is authored
+      transparent and expects this shell underneath.
+
+      Layer order matters and is controlled by CSS z-index, NOT data-track-index
+      (track index governs temporal overlap only):
+          paper  z-index 0
+          head   z-index 1
+          blocks z-index 2
+    -->
+
+    <style>
+      /* ---- paste into your host <style> ---- */
+      #paper {
+        position: absolute;
+        inset: 0;
+        background: var(--paper, #fdfdfd);
+        z-index: 0;
+      }
+      .headcard {
+        position: absolute;
+        left: 56px;
+        top: 1193px;
+        width: 972px;
+        height: 727px;
+        object-fit: cover;
+        /* Y% picks which slice of the over-tall source fills the card. Lower it for
+           more headroom, raise it to push the crop down the body. */
+        object-position: 50% 12%;
+        border-radius: 28px 28px 0 0;
+        z-index: 1;
+      }
+      #root > div[data-composition-src] {
+        position: absolute;
+        inset: 0;
+        z-index: 2;
+      }
+    </style>
+
+    <!-- ---- paste into your root composition ---- -->
+    <div id="paper" class="clip" data-start="0" data-duration="30" data-track-index="0"></div>
+
+    <!--
+      One <video> per stretch where the face is on screen. The card is STATIC by
+      design — never tween it; all motion belongs in the block above it.
+      data-media-start is the offset INTO your source file.
+    -->
+    <video
+      id="head-a"
+      class="clip headcard"
+      src="assets/talkinghead.mp4"
+      data-start="0"
+      data-duration="8"
+      data-media-start="1"
+      data-track-index="1"
+      muted
+      playsinline
+    ></video>
+
+    <!-- Audio always rides a separate element; the <video> stays muted. -->
+    <audio
+      id="head-a-audio"
+      src="assets/talkinghead.mp4"
+      data-start="0"
+      data-duration="8"
+      data-media-start="1"
+      data-track-index="10"
+      data-volume="1"
+    ></audio>
+  </body>
+</html>

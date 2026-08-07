@@ -1,0 +1,331 @@
+<!-- hyperframes-registry-item: ugc-orbit-ring -->
+<!doctype html>
+<html
+  lang="en"
+  data-composition-variables='[
+    {"id":"tiles","type":"string","label":"Tiles (label:glyph:color)","default":"Docs:D:#E4674A,Calendar:C:#2C7BE5,Email:M:#D93F3F,Analytics:A:#E8734A,Ops:O:#5B6470,Legal:L:#7C5CE6,Support:S:#0FA3A3,HR:H:#2C7BE5,Finance:F:#B8800A,Sales:$:#12A150"},
+    {"id":"caption","type":"string","label":"Caption","default":"wired into everything"},
+    {"id":"accent","type":"color","label":"Hub colour","default":"#CD6E58"}
+  ]'
+>
+  <head>
+    <meta charset="UTF-8" />
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+<style>
+        #root {
+          position: absolute;
+          inset: 0;
+          --ink: #111111;
+          --accent: #cd6e58;
+          --muted: #8a8580;
+        }
+        /* Full-bleed fill goes on a CHILD, never on the composition root. */
+        .fill {
+          position: absolute;
+          inset: 0;
+          background: #fdfdfd;
+        }
+        .wires {
+          position: absolute;
+          inset: 0;
+        }
+        .core {
+          position: absolute;
+          left: 456px;
+          top: 576px;
+          width: 168px;
+          height: 168px;
+          display: grid;
+          place-items: center;
+          opacity: 0;
+        }
+        .tile {
+          position: absolute;
+          width: 118px;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          gap: 12px;
+          opacity: 0;
+        }
+        .tile .ico {
+          position: relative;
+          display: grid;
+          place-items: center;
+          width: 96px;
+          height: 96px;
+          border-radius: 24px;
+          box-shadow: 0 10px 26px rgba(17, 17, 17, 0.13);
+        }
+        .tile .glyph {
+          display: block;
+          font-family: "Inter", sans-serif;
+          font-weight: 900;
+          font-size: 40px;
+          color: #fff;
+          line-height: 1;
+        }
+        .tile .badge {
+          position: absolute;
+          right: -9px;
+          top: -9px;
+          width: 34px;
+          height: 34px;
+          border-radius: 50%;
+          background: #12a150;
+          border: 4px solid #fdfdfd;
+          display: grid;
+          place-items: center;
+          opacity: 0;
+        }
+        .tile .badge svg {
+          display: block;
+        }
+        .tile .lbl {
+          display: block;
+          font-family: "Inter", sans-serif;
+          font-weight: 700;
+          font-size: 25px;
+          color: #4a4540;
+          text-align: center;
+          white-space: nowrap;
+        }
+        .counter {
+          position: absolute;
+          left: 50%;
+          /* Clears the ring's 12-o'clock tile, whose box starts at y=270. */
+          top: 146px;
+          transform-origin: 50% 50%;
+          margin-left: -132px;
+          width: 264px;
+          height: 76px;
+          border-radius: 999px;
+          background: #12a150;
+          display: grid;
+          place-items: center;
+          opacity: 0;
+          box-shadow: 0 10px 26px rgba(18, 161, 80, 0.28);
+        }
+        .counter span {
+          display: block;
+          font-family: "Inter", sans-serif;
+          font-weight: 900;
+          font-size: 36px;
+          color: #fff;
+          font-variant-numeric: tabular-nums;
+        }
+        .bcap {
+          position: absolute;
+          left: 0;
+          top: 1180px;
+          width: 1080px;
+          text-align: center;
+          font-family: "Playfair Display", serif;
+          font-weight: 900;
+          font-style: italic;
+          font-size: 78px;
+          line-height: 1.1;
+          text-transform: uppercase;
+          color: var(--ink);
+          -webkit-text-stroke: 11px #fdfdfd;
+          paint-order: stroke fill;
+          opacity: 0;
+        }
+      </style>
+    <style>
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      html, body { background: #FDFDFD; overflow: hidden; }
+      body { width: 1080px; height: 1920px; }
+    </style>
+  </head>
+  <body>
+    <div
+      id="root"
+      data-composition-id="ugc-orbit-ring"
+      data-start="0"
+      data-duration="5.5"
+      data-width="1080"
+      data-height="1920"
+    >
+        <div class="fill"></div>
+
+        <svg class="wires" viewBox="0 0 1080 1920" width="1080" height="1920" fill="none">
+          <g id="uo-wires" stroke="#D9D4CE" stroke-width="2.5" stroke-linecap="round"></g>
+        </svg>
+
+        <div id="uo-core" class="core">
+          <!-- Pixel mascot — the recurring anchor mark. Swap for your own logo. -->
+          <svg width="150" height="120" viewBox="0 0 15 12" shape-rendering="crispEdges">
+            <path
+              fill="#CD6E58"
+              d="M2 1h11v6H2z M0 3h2v3H0z M13 3h2v3h-2z M3 7h2v4H3z M6 7h3v4H6z M10 7h2v4h-2z"
+            />
+            <path fill="#2B1A14" d="M5 3h2v2H5z M9 3h2v2H9z" />
+          </svg>
+        </div>
+
+        <div id="uo-tiles"></div>
+
+        <div id="uo-counter" class="counter"><span id="uo-count">0 / 10</span></div>
+
+        <div id="uo-cap" class="bcap">wired into everything</div>
+      </div>
+<script>
+        (() => {
+          
+          // ---- props: declared on <html>, overridable per mount via data-variable-values ----
+          const V =
+            (window.__hyperframes && window.__hyperframes.getVariables
+              ? window.__hyperframes.getVariables()
+              : null) || {};
+          const rows = (s, n) =>
+            String(s).split(",").map((r) => r.split(":").map((x) => x.trim())).filter((r) => r.length >= n);
+          const caps = (s) =>
+            String(s)
+              .split("|")
+              .map((c) => {
+                const i = c.lastIndexOf("@");
+                if (i < 0) return null;
+                const t = parseFloat(c.slice(i + 1));
+                return isFinite(t) ? { text: c.slice(0, i), t } : null;
+              })
+              .filter(Boolean);
+          const TILES = rows(
+            V.tiles || "Docs:D:#E4674A,Calendar:C:#2C7BE5,Email:M:#D93F3F,Analytics:A:#E8734A,Ops:O:#5B6470,Legal:L:#7C5CE6,Support:S:#0FA3A3,HR:H:#2C7BE5,Finance:F:#B8800A,Sales:$:#12A150", 3,
+          ).map((r) => ({ label: r[0], glyph: r[1], color: r[2] }));
+          const CAPTION_AT = 2.1;
+
+          const CX = 540,
+            CY = 660,
+            R = 342; // ring geometry
+          const TILE_W = 118,
+            ICO = 96;
+          const DUR = 5.5;
+
+          const scene = document.querySelector('[data-composition-id="ugc-orbit-ring"]');
+          const host = scene.querySelector("#uo-tiles");
+          const wires = scene.querySelector("#uo-wires");
+          const SVGNS = "http://www.w3.org/2000/svg";
+          scene.querySelector("#uo-cap").textContent = V.caption || "wired into everything";
+          if (V.accent) scene.querySelector("#uo-core path").setAttribute("fill", V.accent);
+
+          const nodes = TILES.map((t, i) => {
+            // Start at 12 o'clock and walk clockwise.
+            const a = (i / TILES.length) * Math.PI * 2 - Math.PI / 2;
+            const cx = CX + Math.cos(a) * R;
+            const cy = CY + Math.sin(a) * R;
+
+            const el = document.createElement("div");
+            el.className = "tile";
+            el.style.left = cx - TILE_W / 2 + "px";
+            el.style.top = cy - ICO / 2 + "px";
+            el.innerHTML =
+              '<span class="ico" style="background:' +
+              t.color +
+              '"><span class="glyph">' +
+              t.glyph +
+              '</span><span class="badge"><svg width="16" height="16" viewBox="0 0 16 16">' +
+              '<path d="M3.5 8.4l3 3 6-6.5" stroke="#fff" stroke-width="2.6" fill="none" ' +
+              'stroke-linecap="round" stroke-linejoin="round"/></svg></span></span>' +
+              '<span class="lbl">' +
+              t.label +
+              "</span>";
+            host.appendChild(el);
+
+            // svg-path-draw: one straight wire per tile, length known analytically.
+            const line = document.createElementNS(SVGNS, "line");
+            const gap = 96; // stop short of the core and the tile
+            const ux = Math.cos(a),
+              uy = Math.sin(a);
+            line.setAttribute("x1", CX + ux * gap);
+            line.setAttribute("y1", CY + uy * gap);
+            line.setAttribute("x2", cx - ux * (ICO / 2 + 8));
+            line.setAttribute("y2", cy - uy * (ICO / 2 + 8));
+            const len = Math.hypot(
+              cx - ux * (ICO / 2 + 8) - (CX + ux * gap),
+              cy - uy * (ICO / 2 + 8) - (CY + uy * gap),
+            );
+            line.setAttribute("stroke-dasharray", len);
+            line.setAttribute("stroke-dashoffset", len);
+            wires.appendChild(line);
+
+            return { el, line, len, badge: el.querySelector(".badge") };
+          });
+
+          window.__timelines = window.__timelines || {};
+          const tl = gsap.timeline({ paused: true });
+
+          // The hub lands first.
+          tl.set("#uo-core", { opacity: 1 }, 0);
+          tl.fromTo(
+            "#uo-core",
+            { scale: 0.3 },
+            { scale: 1, duration: 0.62, ease: "back.out(2.4)" },
+            0,
+          );
+
+          tl.set("#uo-counter", { opacity: 1 }, 0.3);
+          tl.fromTo(
+            "#uo-counter",
+            { scale: 0.5 },
+            { scale: 1, duration: 0.5, ease: "back.out(2)" },
+            0.3,
+          );
+
+          // constellation-hub: nodes spring into the ring; each wire draws as its node lands.
+          const FIRST = 0.5,
+            STEP = 0.11;
+          nodes.forEach((n, i) => {
+            const at = FIRST + i * STEP;
+            tl.fromTo(n.line, { strokeDashoffset: n.len }, {
+              strokeDashoffset: 0,
+              duration: 0.42,
+              ease: "power2.out",
+            }, at);
+            tl.set(n.el, { opacity: 1 }, at + 0.14);
+            tl.fromTo(
+              n.el,
+              { scale: 0.2 },
+              { scale: 1, duration: 0.62, ease: "back.out(2.6)" },
+              at + 0.14,
+            );
+            tl.set(n.badge, { opacity: 1 }, at + 0.46);
+            tl.fromTo(
+              n.badge,
+              { scale: 0 },
+              { scale: 1, duration: 0.34, ease: "back.out(3)" },
+              at + 0.46,
+            );
+          });
+
+          // counting-dynamic-scale: the tally tracks the ring filling up.
+          const proxy = { v: 0 };
+          const out = scene.querySelector("#uo-count");
+          const total = TILES.length;
+          out.textContent = "0 / " + total; // keep the resting state honest for any TILES length
+          tl.to(
+            proxy,
+            {
+              v: total,
+              duration: FIRST + (total - 1) * STEP + 0.46 - 0.35,
+              ease: "none",
+              onUpdate: () => {
+                out.textContent = Math.round(proxy.v) + " / " + total;
+              },
+            },
+            0.35,
+          );
+
+          tl.set("#uo-cap", { opacity: 1 }, CAPTION_AT);
+          tl.fromTo(
+            "#uo-cap",
+            { y: 18, scale: 0.96 },
+            { y: 0, scale: 1, duration: 0.3, ease: "power3.out" },
+            CAPTION_AT,
+          );
+
+          window.__timelines["ugc-orbit-ring"] = tl;
+        })();
+      </script>
+  </body>
+</html>

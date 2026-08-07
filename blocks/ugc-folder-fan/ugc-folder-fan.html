@@ -1,0 +1,273 @@
+<!-- hyperframes-registry-item: ugc-folder-fan -->
+<!doctype html>
+<html
+  lang="en"
+  data-composition-variables='[
+    {"id":"files","type":"string","label":"Chips (name:color)","default":"brand.md:#E4674A,voice.md:#7C5CE6,hooks.json:#2C7BE5,beats.yaml:#12A150,post.ts:#E8A317"},
+    {"id":"captions","type":"string","label":"Seam captions (text@seconds)","default":"a free@0.2|pack of@1.5|everything@2.9"}
+  ]'
+>
+  <head>
+    <meta charset="UTF-8" />
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+<style>
+        #root {
+          position: absolute;
+          inset: 0;
+          --ink: #111111;
+          --muted: #8a8580;
+          --accent: #cd6e58;
+          --border: #eceae6;
+        }
+        /* Outer travels (GSAP x/y/scale); inner holds the static CSS tilt.
+           Splitting them keeps every rotation pivoted on its own centre. */
+        .chip {
+          position: absolute;
+          width: 132px;
+          height: 162px;
+          opacity: 0;
+        }
+        .chip > .face {
+          display: flex;
+          flex-direction: column;
+          justify-content: space-between;
+          width: 132px;
+          height: 162px;
+          background: #fff;
+          border: 1.5px solid var(--border);
+          border-radius: 14px;
+          box-shadow: 0 8px 28px rgba(17, 17, 17, 0.07);
+          padding: 14px 12px;
+        }
+        .chip .sq {
+          display: block;
+          width: 34px;
+          height: 34px;
+          border-radius: 9px;
+        }
+        .chip .fn {
+          display: block;
+          font-family: "JetBrains Mono", monospace;
+          font-size: 17px;
+          color: #4a4540;
+          word-break: break-all;
+          line-height: 1.25;
+        }
+        /* Folder — back panel, contents lip, front panel with a tab. */
+        .folder {
+          position: absolute;
+          left: 390px;
+          top: 520px;
+          width: 300px;
+          height: 208px;
+          opacity: 0;
+        }
+        .folder .back {
+          position: absolute;
+          left: 0;
+          top: 0;
+          width: 300px;
+          height: 200px;
+          background: #b8563d;
+          border-radius: 16px 16px 18px 18px;
+        }
+        .folder .tab {
+          position: absolute;
+          left: 12px;
+          top: -18px;
+          width: 122px;
+          height: 30px;
+          background: #b8563d;
+          border-radius: 12px 12px 0 0;
+        }
+        .folder .lip {
+          position: absolute;
+          left: 22px;
+          top: 26px;
+          width: 256px;
+          height: 150px;
+          background: #fdfdfd;
+          border-radius: 8px;
+        }
+        .folder .front {
+          position: absolute;
+          left: 0;
+          top: 52px;
+          width: 300px;
+          height: 156px;
+          background: linear-gradient(168deg, #dd7a5c 0%, #cd6e58 60%, #c2634d 100%);
+          border-radius: 10px 10px 18px 18px;
+        }
+        .seam {
+          position: absolute;
+          left: 0;
+          top: 862px;
+          width: 1080px;
+          height: 106px;
+          display: grid;
+          place-items: center;
+        }
+        .word {
+          position: absolute;
+          font-family: "Archivo Black", sans-serif;
+          font-size: 76px;
+          line-height: 1;
+          color: var(--ink);
+          opacity: 0;
+          white-space: nowrap;
+        }
+      </style>
+    <style>
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      html, body { background: transparent; overflow: hidden; }
+      body { width: 1080px; height: 1920px; }
+    </style>
+  </head>
+  <body>
+    <div
+      id="root"
+      data-composition-id="ugc-folder-fan"
+      data-start="0"
+      data-duration="4.5"
+      data-width="1080"
+      data-height="1920"
+    >
+        <div id="uf-chips"></div>
+
+        <div id="uf-folder-el" class="folder">
+          <span class="tab"></span>
+          <span class="back"></span>
+          <span class="lip"></span>
+          <span class="front"></span>
+        </div>
+
+        <div id="uf-seam" class="seam"></div>
+      </div>
+<script>
+        (() => {
+          
+          // ---- props: declared on <html>, overridable per mount via data-variable-values ----
+          const V =
+            (window.__hyperframes && window.__hyperframes.getVariables
+              ? window.__hyperframes.getVariables()
+              : null) || {};
+          const rows = (s, n) =>
+            String(s).split(",").map((r) => r.split(":").map((x) => x.trim())).filter((r) => r.length >= n);
+          const caps = (s) =>
+            String(s)
+              .split("|")
+              .map((c) => {
+                const i = c.lastIndexOf("@");
+                if (i < 0) return null;
+                const t = parseFloat(c.slice(i + 1));
+                return isFinite(t) ? { text: c.slice(0, i), t } : null;
+              })
+              .filter(Boolean);
+          const FILES = rows(
+            V.files || "brand.md:#E4674A,voice.md:#7C5CE6,hooks.json:#2C7BE5,beats.yaml:#12A150,post.ts:#E8A317", 2,
+          ).map((r) => ({ name: r[0], color: r[1] }));
+          const CAPS = caps(V.captions || "a free@0.2|pack of@1.5|everything@2.9");
+          const CAPTIONS = CAPS.map((c) => c.t);
+
+          const ARC_CX = 540,
+            ARC_CY = 500,
+            ARC_R = 258; // fan geometry
+          const CHIP_W = 132,
+            CHIP_H = 162;
+          const ORIGIN_X = 540,
+            ORIGIN_Y = 624; // inside the folder
+
+          const scene = document.querySelector('[data-composition-id="ugc-folder-fan"]');
+          const host = scene.querySelector("#uf-chips");
+
+          // Spread must keep neighbouring chips from overlapping: the arc distance
+          // between slots is ARC_R × step-angle, which has to exceed CHIP_W.
+          const spread = 64; // degrees to each side
+          const placed = FILES.map((f, i) => {
+            const t = FILES.length === 1 ? 0 : (i / (FILES.length - 1)) * 2 - 1; // -1..1
+            const a = (t * spread * Math.PI) / 180;
+            const cx = ARC_CX + Math.sin(a) * ARC_R;
+            const cy = ARC_CY - Math.cos(a) * ARC_R;
+            const rot = t * spread * 0.5;
+
+            // Lay the fan out ONCE in CSS; GSAP only tweens offsets back to zero.
+            const el = document.createElement("div");
+            el.className = "chip";
+            el.style.left = cx - CHIP_W / 2 + "px";
+            el.style.top = cy - CHIP_H / 2 + "px";
+            el.innerHTML =
+              '<span class="face" style="transform:rotate(' +
+              rot.toFixed(2) +
+              'deg)"><span class="sq" style="background:' +
+              f.color +
+              '"></span><span class="fn">' +
+              f.name +
+              "</span></span>";
+            host.appendChild(el);
+
+            return { el, dx: ORIGIN_X - cx, dy: ORIGIN_Y - cy };
+          });
+
+          const seamEl = scene.querySelector("#uf-seam");
+          CAPS.forEach((c) => {
+            const d = document.createElement("div");
+            d.className = "word";
+            d.textContent = c.text;
+            seamEl.appendChild(d);
+          });
+          const words = scene.querySelectorAll(".word");
+
+          window.__timelines = window.__timelines || {};
+          const tl = gsap.timeline({ paused: true });
+
+          // spring-pop-entrance: the folder arrives first.
+          tl.set("#uf-folder-el", { opacity: 1 }, 0);
+          tl.fromTo(
+            "#uf-folder-el",
+            { scale: 0.55, y: 40 },
+            { scale: 1, y: 0, duration: 0.6, ease: "back.out(2)" },
+            0,
+          );
+
+          // center-outward-expansion: chips travel from inside the folder to their arc slots.
+          placed.forEach((p, i) => {
+            const at = 0.42 + i * 0.075;
+            tl.set(p.el, { opacity: 1 }, at);
+            tl.fromTo(
+              p.el,
+              { x: p.dx, y: p.dy, scale: 0.35 },
+              { x: 0, y: 0, scale: 1, duration: 0.78, ease: "back.out(1.5)" },
+              at,
+            );
+          });
+
+          // sine-wave-loop: the folder keeps a slow breathe so the frame never freezes.
+          // Finite repeat — floor(remaining / cycle) - 1, never -1.
+          const breatheAt = 1.35,
+            cycle = 1.0;
+          const reps = Math.max(0, Math.floor((4.5 - breatheAt) / cycle) - 1);
+          tl.to(
+            "#uf-folder-el",
+            {
+              y: -14,
+              duration: cycle / 2,
+              ease: "sine.inOut",
+              yoyo: true,
+              repeat: reps,
+            },
+            breatheAt,
+          );
+
+          words.forEach((w, i) => {
+            const on = CAPTIONS[i];
+            const off = i < CAPTIONS.length - 1 ? CAPTIONS[i + 1] : 4.5;
+            tl.set(w, { opacity: 1 }, on);
+            tl.fromTo(w, { y: 14 }, { y: 0, duration: 0.22, ease: "power2.out" }, on);
+            if (off < 4.5) tl.set(w, { opacity: 0 }, off);
+          });
+
+          window.__timelines["ugc-folder-fan"] = tl;
+        })();
+      </script>
+  </body>
+</html>

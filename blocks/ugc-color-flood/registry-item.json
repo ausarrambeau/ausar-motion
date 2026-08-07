@@ -1,0 +1,23 @@
+{
+  "$schema": "https://hyperframes.heygen.com/schema/registry-item.json",
+  "name": "ugc-color-flood",
+  "type": "hyperframes:block",
+  "title": "UGC \u2014 Colour Flood",
+  "description": "Accent colour wipes up the frame and a column of product marks pops in \u2014 the breather beat between acts",
+  "tags": [
+    "ugc-split",
+    "transition"
+  ],
+  "dimensions": {
+    "width": 1080,
+    "height": 1920
+  },
+  "duration": 2.0,
+  "files": [
+    {
+      "path": "ugc-color-flood.html",
+      "target": "compositions/ugc-color-flood.html",
+      "type": "hyperframes:composition"
+    }
+  ]
+}

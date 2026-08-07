@@ -1,0 +1,23 @@
+{
+  "$schema": "https://hyperframes.heygen.com/schema/registry-item.json",
+  "name": "ugc-install-card",
+  "type": "hyperframes:block",
+  "title": "UGC \u2014 Install Progress Card",
+  "description": "A name types itself into a card, a progress bar fills under a live percentage, and the status dot flips to a green tick",
+  "tags": [
+    "ugc-split",
+    "data-viz"
+  ],
+  "dimensions": {
+    "width": 1080,
+    "height": 1920
+  },
+  "duration": 4.5,
+  "files": [
+    {
+      "path": "ugc-install-card.html",
+      "target": "compositions/ugc-install-card.html",
+      "type": "hyperframes:composition"
+    }
+  ]
+}

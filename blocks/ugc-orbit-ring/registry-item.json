@@ -1,0 +1,23 @@
+{
+  "$schema": "https://hyperframes.heygen.com/schema/registry-item.json",
+  "name": "ugc-orbit-ring",
+  "type": "hyperframes:block",
+  "title": "UGC \u2014 Constellation Ring",
+  "description": "Icon tiles spring into a ring around a hub while SVG wires draw outward and a counter chip tallies them off",
+  "tags": [
+    "ugc-split",
+    "data-viz"
+  ],
+  "dimensions": {
+    "width": 1080,
+    "height": 1920
+  },
+  "duration": 5.5,
+  "files": [
+    {
+      "path": "ugc-orbit-ring.html",
+      "target": "compositions/ugc-orbit-ring.html",
+      "type": "hyperframes:composition"
+    }
+  ]
+}

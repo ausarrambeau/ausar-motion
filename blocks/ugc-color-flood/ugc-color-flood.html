@@ -1,0 +1,168 @@
+<!-- hyperframes-registry-item: ugc-color-flood -->
+<!doctype html>
+<html
+  lang="en"
+  data-composition-variables='[
+    {"id":"caption","type":"string","label":"Caption","default":"actually wired"},
+    {"id":"accent","type":"color","label":"Flood colour","default":"#CD6E58"}
+  ]'
+>
+  <head>
+    <meta charset="UTF-8" />
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+<style>
+        #root {
+          position: absolute;
+          inset: 0;
+          --accent: #cd6e58;
+          --cream: #fff3ef;
+        }
+        .fill {
+          position: absolute;
+          inset: 0;
+          background: #fdfdfd;
+        }
+        /* The wipe. transform-origin bottom so it climbs the frame. */
+        .flood {
+          position: absolute;
+          inset: 0;
+          background: var(--accent);
+          transform-origin: 50% 100%;
+        }
+        .column {
+          position: absolute;
+          left: 50%;
+          top: 380px;
+          margin-left: -84px;
+          width: 168px;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          gap: 34px;
+        }
+        .mark {
+          display: grid;
+          place-items: center;
+          width: 168px;
+          height: 168px;
+          border-radius: 40px;
+          background: #fff;
+          box-shadow: 0 14px 34px rgba(90, 34, 20, 0.22);
+          opacity: 0;
+        }
+        .mark span {
+          display: block;
+          font-family: "Archivo Black", sans-serif;
+          font-size: 72px;
+          line-height: 1;
+        }
+        .bcap {
+          position: absolute;
+          left: 0;
+          top: 1180px;
+          width: 1080px;
+          text-align: center;
+          font-family: "Playfair Display", serif;
+          font-weight: 900;
+          font-style: italic;
+          font-size: 82px;
+          line-height: 1.1;
+          text-transform: uppercase;
+          color: #2b1a14;
+          -webkit-text-stroke: 11px var(--cream);
+          paint-order: stroke fill;
+          opacity: 0;
+        }
+      </style>
+    <style>
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      html, body { background: #FDFDFD; overflow: hidden; }
+      body { width: 1080px; height: 1920px; }
+    </style>
+  </head>
+  <body>
+    <div
+      id="root"
+      data-composition-id="ugc-color-flood"
+      data-start="0"
+      data-duration="2.0"
+      data-width="1080"
+      data-height="1920"
+    >
+        <div class="fill"></div>
+        <div id="uc-flood-el" class="flood"></div>
+
+        <div class="column">
+          <!-- CONFIG: swap these three marks for your own stack / logos. -->
+          <span class="mark" data-m="0"><span style="color: #cd6e58">✳</span></span>
+          <span class="mark" data-m="1"><span style="color: #2c7be5">◍</span></span>
+          <span class="mark" data-m="2"><span style="color: #12a150">◆</span></span>
+        </div>
+
+        <div id="uc-cap" class="bcap">actually wired</div>
+      </div>
+<script>
+        (() => {
+          
+          // ---- props: declared on <html>, overridable per mount via data-variable-values ----
+          const V =
+            (window.__hyperframes && window.__hyperframes.getVariables
+              ? window.__hyperframes.getVariables()
+              : null) || {};
+          const rows = (s, n) =>
+            String(s).split(",").map((r) => r.split(":").map((x) => x.trim())).filter((r) => r.length >= n);
+          const caps = (s) =>
+            String(s)
+              .split("|")
+              .map((c) => {
+                const i = c.lastIndexOf("@");
+                if (i < 0) return null;
+                const t = parseFloat(c.slice(i + 1));
+                return isFinite(t) ? { text: c.slice(0, i), t } : null;
+              })
+              .filter(Boolean);
+          const MARK_START = 0.34;
+          const MARK_STEP = 0.14;
+          const CAPTION_AT = 0.62;
+
+          const scene = document.querySelector('[data-composition-id="ugc-color-flood"]');
+          const marks = scene.querySelectorAll(".mark");
+          scene.querySelector("#uc-cap").textContent = V.caption || "actually wired";
+          if (V.accent) scene.querySelector("#uc-flood-el").style.background = V.accent;
+
+          window.__timelines = window.__timelines || {};
+          const tl = gsap.timeline({ paused: true });
+
+          // titlecard-reveal: ONE restrained move carries the beat — the wipe.
+          tl.fromTo(
+            "#uc-flood-el",
+            { scaleY: 0 },
+            { scaleY: 1, duration: 0.42, ease: "power3.inOut" },
+            0,
+          );
+
+          // waterfall-entry into spring-pop: the column arrives top-down.
+          marks.forEach((m, i) => {
+            const at = MARK_START + i * MARK_STEP;
+            tl.set(m, { opacity: 1 }, at);
+            tl.fromTo(
+              m,
+              { scale: 0.3, y: 30 },
+              { scale: 1, y: 0, duration: 0.5, ease: "back.out(2.4)" },
+              at,
+            );
+          });
+
+          tl.set("#uc-cap", { opacity: 1 }, CAPTION_AT);
+          tl.fromTo(
+            "#uc-cap",
+            { y: 22, scale: 0.95 },
+            { y: 0, scale: 1, duration: 0.32, ease: "power3.out" },
+            CAPTION_AT,
+          );
+
+          window.__timelines["ugc-color-flood"] = tl;
+        })();
+      </script>
+  </body>
+</html>

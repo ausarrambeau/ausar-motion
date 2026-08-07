@@ -1,0 +1,4 @@
+# Build toolchain deps — reinstall with `npm install` in tools/react-prerender
+node_modules/
+# Demo renders are regenerable artifacts, not source
+*.mp4
