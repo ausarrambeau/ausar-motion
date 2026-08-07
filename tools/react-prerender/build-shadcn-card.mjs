@@ -29,7 +29,7 @@ const CHROME = "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome";
 
 const DURATION = 5.5;
 const CARD_LEFT = 70;
-const CARD_TOP = 300;
+const CARD_TOP = 452;   // = ugc-dashboard's panel top, so full-bleed scenes align
 
 mkdirSync(TMP, { recursive: true });
 
@@ -192,15 +192,24 @@ ${css}
         border: 1.5px solid #eceae6;
         box-shadow: 0 18px 48px rgba(17, 17, 17, 0.1);
       }
+      /* The pack's full-bleed caption treatment — identical to .bcap in
+         ugc-dashboard, so consecutive full-bleed scenes read as one format.
+         The paper-coloured stroke under the fill is what keeps it legible
+         wherever it lands. */
       #sc-caption {
         position: absolute;
-        left: ${CARD_LEFT}px;
-        top: ${CARD_TOP + 760}px;
-        width: 940px;
+        left: 0;
+        top: 1180px;
+        width: 1080px;
         text-align: center;
-        font-size: 30px;
-        font-weight: 600;
-        color: #6f6a64;
+        font-family: "Playfair Display", serif;
+        font-weight: 900;
+        font-style: italic;
+        font-size: 78px;
+        text-transform: uppercase;
+        color: #111111;
+        -webkit-text-stroke: 11px #fdfdfd;
+        paint-order: stroke fill;
         opacity: 0;
       }
       /* svg-path-draw: dash length baked in Node — never measured at seek time. */
@@ -233,7 +242,15 @@ ${markup
     <script>
       (function () {
         window.__timelines = window.__timelines || {};
-        const V = window.__variables || {};
+        // Props: declared on <html>, overridable per mount via data-variable-values.
+        // ⚠ The accessor is window.__hyperframes.getVariables() — there is no
+        // window.__variables. Getting it wrong fails SILENTLY: V is {}, every prop
+        // falls through to its default, and the block looks correct because the
+        // defaults are the design. Nothing errors and lint stays clean.
+        const V =
+          (window.__hyperframes && window.__hyperframes.getVariables
+            ? window.__hyperframes.getVariables()
+            : null) || {};
         const root = document.getElementById("root");
         if (V.accent) root.style.setProperty("--accent", V.accent);
 
