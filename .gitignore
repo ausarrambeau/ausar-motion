@@ -2,3 +2,5 @@
 node_modules/
 # Demo renders are regenerable artifacts, not source
 *.mp4
+tools/react-prerender/proof/out/
+tools/react-prerender/.card-build/

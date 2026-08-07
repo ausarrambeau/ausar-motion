@@ -1,0 +1,20 @@
+{
+  "$schema": "https://hyperframes.heygen.com/schema/registry-item.json",
+  "name": "ugc-shadcn-card",
+  "type": "hyperframes:block",
+  "title": "UGC — shadcn Stat Card",
+  "description": "A real shadcn/ui Card — Badge, Progress and a Recharts area chart — prerendered from React at build time, then animated: spring entrance, count-up, progress fill, path draw",
+  "tags": ["ugc-split", "data-viz", "react"],
+  "dimensions": {
+    "width": 1080,
+    "height": 1920
+  },
+  "duration": 5.5,
+  "files": [
+    {
+      "path": "ugc-shadcn-card.html",
+      "target": "compositions/ugc-shadcn-card.html",
+      "type": "hyperframes:composition"
+    }
+  ]
+}

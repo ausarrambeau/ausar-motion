@@ -38,6 +38,10 @@
     {
       "name": "ugc-react-chart",
       "type": "hyperframes:block"
+    },
+    {
+      "name": "ugc-shadcn-card",
+      "type": "hyperframes:block"
     }
   ]
 }
