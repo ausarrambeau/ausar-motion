@@ -75,6 +75,7 @@ Two traps it documents, both of which fail quietly:
 | `ugc-dashboard`     | block     | 5.5s  | Line chart draws, bars grow, headline numbers count   |
 | `ugc-react-chart`   | block     | 5.0s  | visx chart prerendered to SVG, drawn on with GSAP     |
 | `ugc-shadcn-card`   | block     | 5.5s  | Real shadcn/ui Card + Badge + Progress + Recharts area chart |
+| `ugc-shadcn-dialog` | block     | 5.0s  | Real shadcn/ui Dialog: scrim, spring-in, scope badges, confirm→confirmed |
 
 Start from `ugc-split-shell` — it's the host markup and CSS every block expects underneath.
 
@@ -181,11 +182,44 @@ browser. Only an actual render catches them.
   `var(--default-font-family, …"Apple Color Emoji"…)`. Defining the variable is not enough:
   HyperFrames resolves every family it finds in the CSS *text*, dead fallback included. Prune it.
 - **shadcn's `Progress` ships `transition-all`.** A seekable runtime must own that state; GSAP
-  drives the indicator transform instead.
+  drives the indicator transform instead. Strip the **whole class token**, variant prefix
+  included — removing only the utility leaves `data-[state=closed]:` dangling, a class ending
+  in a colon, and Tailwind then emits a malformed rule that kills neighbouring utilities.
+- **Radix centres dialogs with `translate-x/y-[-50%]`.** GSAP writes `transform` wholesale, so
+  the first `scale` tween destroys the centering. Strip the classes and let GSAP own the
+  transform via `xPercent`/`yPercent`, which compose instead of fighting.
+- **Radix ships `position: fixed`** on overlays and dialog content. Inside a composition that
+  resolves against any transformed ancestor the moment GSAP touches one. Rewrite to absolute.
+- **shadcn hard-codes `sm:max-w-lg`** on DialogContent. The renderer is a fixed 1080px viewport
+  so the breakpoint always matches, and tailwind-merge does not merge across variants — a
+  `w-[860px]` className loses silently and the dialog renders half size.
+- **`secondary` / `outline` badge tones are near-white on white.** Correct for a web UI,
+  invisible in video. Give them explicit tones.
 - **Pin Tailwind's sources.** v4 auto-detects content from the CSS file's directory, so generated
   block CSS drifts with unrelated neighbouring files. Use `source(none)` *plus* an explicit
   `@source` — on its own, `source(none)` makes the CLI's `--content` flag inert and emits base
   styles with **zero utilities**, which renders as unstyled components rather than an error.
+
+### ⛔ CSS `@layer` does not survive the renderer
+
+The worst one, because it fails **per-property** instead of all at once. Same element,
+same declaration:
+
+| rule                                                     | computed |
+| -------------------------------------------------------- | -------- |
+| `padding: calc(var(--spacing) * 10)` — **unlayered**      | **40px** |
+| identical rule inside `@layer utilities`                  | 0px      |
+| `padding-right: 40px` (literal) inside `@layer utilities` | 0px      |
+
+It is the layer, not the `calc()` — `--spacing` resolves on the element and the
+selector matches. Tailwind puts preflight in `@layer base` and utilities in
+`@layer utilities`; both lose, so preflight's reset stands and every utility it
+zeroes is silently dead: **padding, margin, border-width**. Colours, radius, flex and
+gap are untouched, which is exactly why nothing looks broken — a card whose text sits
+6px from its edge instead of 36px reads as tight styling. `check` passes.
+
+`compileTailwind()` flattens the layer wrappers before emitting. Tailwind already
+orders theme → base → components → utilities, so source order gives utilities the win.
 
 ### Why not `hyperframes init --tailwind` for blocks
 
