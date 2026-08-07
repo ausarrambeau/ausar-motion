@@ -74,6 +74,7 @@ Two traps it documents, both of which fail quietly:
 | `ugc-install-card`  | block     | 4.5s  | Name types, bar fills, status flips to a green tick   |
 | `ugc-dashboard`     | block     | 5.5s  | Line chart draws, bars grow, headline numbers count   |
 | `ugc-react-chart`   | block     | 5.0s  | visx chart prerendered to SVG, drawn on with GSAP     |
+| `ugc-shadcn-card`   | block     | 5.5s  | Real shadcn/ui Card + Badge + Progress + Recharts area chart |
 
 Start from `ugc-split-shell` — it's the host markup and CSS every block expects underneath.
 
@@ -140,6 +141,63 @@ Two things that keep it deterministic and are easy to get wrong:
   measured geometry becomes seek-order dependent. Measure in Node; bake the constant.
 - **Don't assume attribute order in generated markup.** visx emits `d` before `id`; a regex written
   the other way round silently matches nothing.
+
+### When `renderToStaticMarkup` isn't enough — `npm run build:card`
+
+`ugc-shadcn-card` is built from real upstream [shadcn/ui](https://ui.shadcn.com) source plus
+[Recharts](https://recharts.org) — the same base [Bklit UI](https://bklit.com) sits on. Server
+rendering only gets part of the way there. Measured, in `tools/react-prerender/proof/`:
+
+| Library                                        | `renderToStaticMarkup`                        |
+| ---------------------------------------------- | --------------------------------------------- |
+| shadcn markup (Card/Badge, cva + tailwind-merge) | renders                                     |
+| Radix inline primitives (Progress, Slot)       | renders, but effects never run so `data-state` is wrong |
+| Radix portals (Dialog, Tooltip, Popover, Select) | **empty string**                            |
+| Recharts 2.x                                   | renders real SVG                              |
+| Recharts 3.x                                   | **empty `<div class="recharts-wrapper">`, no svg** |
+
+Nothing throws in any of those rows — the empty ones just return nothing, so a build that only
+checks for exceptions reports success and ships a blank chart.
+
+So `build:card` mounts the component **once in headless Chrome** at build time and serialises the
+DOM it produced. That covers every row at once, needs no dependency beyond the Chrome already
+installed, and still ships zero React.
+
+### Traps that exist only in the render
+
+Each of these produced a file that was correct on disk and pixel-perfect opened directly in a
+browser. Only an actual render catches them.
+
+- **`<svg><title>` swallows the rest of the chart.** HyperFrames compiles with an HTML parser,
+  where `<title>` is an RCDATA element — everything after it is consumed as escaped *text* and the
+  SVG collapses into a single text node. Recharts emits `<title></title><desc></desc>` for screen
+  readers. The symptom is `GSAP target not found` for every SVG selector, which sends you hunting
+  through GSAP. Strip both tags; a video has no screen reader.
+- **A second `id` attribute is silently ignored.** Recharts already puts a React `useId` on its
+  paths, so injecting your own `id` after it does nothing — the first one wins. Whether yours lands
+  depends on attribute order, so *some* tweens work. Target the `recharts-*` classes instead. Those
+  generated ids also contain colons, which need CSS escaping — rewrite them.
+- **Tailwind's preflight can embed ~183 MB of Apple Color Emoji.** It writes
+  `var(--default-font-family, …"Apple Color Emoji"…)`. Defining the variable is not enough:
+  HyperFrames resolves every family it finds in the CSS *text*, dead fallback included. Prune it.
+- **shadcn's `Progress` ships `transition-all`.** A seekable runtime must own that state; GSAP
+  drives the indicator transform instead.
+- **Pin Tailwind's sources.** v4 auto-detects content from the CSS file's directory, so generated
+  block CSS drifts with unrelated neighbouring files. Use `source(none)` *plus* an explicit
+  `@source` — on its own, `source(none)` makes the CLI's `--content` flag inert and emits base
+  styles with **zero utilities**, which renders as unstyled components rather than an error.
+
+### Why not `hyperframes init --tailwind` for blocks
+
+The flag scaffolds the pinned Tailwind browser runtime **and** the `window.__tailwindReady` promise
+HyperFrames waits on before capturing frame 0. Shipping the runtime script inside a block gives you
+no gate, so frames are captured mid-compile. Measured: a card that was 301px tall and pixel-perfect
+in a browser rendered **149px** tall with its custom `@theme` token contributing no height and no
+colour, while stock utilities applied fine. It is a race, and it fails partially and silently.
+
+That flag is a good choice for a *host project* you author by hand in Tailwind. It is not an
+alternative to prerendering, because it styles markup — it never runs React, so it cannot produce
+chart geometry.
 
 ## Authoring notes
 
