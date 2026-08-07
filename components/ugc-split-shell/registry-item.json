@@ -3,11 +3,12 @@
   "name": "ugc-split-shell",
   "type": "hyperframes:component",
   "title": "Split Shell (paper + head card)",
-  "description": "Host-level shell for the split UGC format: near-white paper, a static rounded talking-head card bleeding off the bottom, and the seam caption band",
+  "description": "Host-level shell for the split UGC format: near-white paper, a static rounded talking-head card bleeding off the bottom, the seam caption band, and an optional frame-break variant where the top of the head rises out of the card",
   "tags": [
     "ugc-split",
     "overlay",
-    "layout"
+    "layout",
+    "frame-break"
   ],
   "files": [
     {

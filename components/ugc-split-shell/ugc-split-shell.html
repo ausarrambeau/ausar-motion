@@ -27,10 +27,13 @@
 
       Layer order matters and is controlled by CSS z-index, NOT data-track-index
       (track index governs temporal overlap only):
-          paper  z-index 0
-          head   z-index 1
-          blocks z-index 2
+          paper   z-index 0
+          head    z-index 1
+          headcut z-index 2   (optional frame break, see PART 2)
+          blocks  z-index 2
     -->
+
+    <!-- ============================ PART 1 — BASE SHELL ============================ -->
 
     <style>
       /* ---- paste into your host <style> ---- */
@@ -48,7 +51,8 @@
         height: 727px;
         object-fit: cover;
         /* Y% picks which slice of the over-tall source fills the card. Lower it for
-           more headroom, raise it to push the crop down the body. */
+           more headroom, raise it to push the crop down the body.
+           ⚠ Using PART 2? Set this to 22% and recompute .headcut. */
         object-position: 50% 12%;
         border-radius: 28px 28px 0 0;
         z-index: 1;
@@ -90,5 +94,79 @@
       data-track-index="10"
       data-volume="1"
     ></audio>
+
+    <!-- ================= PART 2 — OPTIONAL: FRAME BREAK =================
+      The top of the head rises OUT of the card and into the graphic stage.
+
+      Build the matte first — it is a separate media layer, because HyperFrames'
+      realtime effects are whole-media and cannot isolate a region:
+
+          npx hyperframes remove-background assets/talkinghead.mp4 \
+            -o assets/head-cutout.webm --quality best
+
+      Then set .headcard's object-position to 50% 22% so the card's top edge cuts
+      THROUGH the forehead, and lay this background-removed copy over it in exact
+      pixel alignment, clipped so only the strip ABOVE the card edge draws. Below
+      the edge the normal card plays — no double-render, no matte fringe on the face.
+
+      DERIVE the numbers, never nudge them. With CARD_W/CARD_H/CARD_TOP and a
+      SRC_W x SRC_H source, at object-position 50% P%:
+
+          scale        = CARD_W / SRC_W                        (object-fit: cover)
+          scaledH      = SRC_H * scale
+          overflow     = scaledH - CARD_H                      (croppable height)
+          cropOffset   = overflow * P/100
+          element top  = CARD_TOP - cropOffset
+          clip bottom  = scaledH - cropOffset
+          overhang     = cropOffset - (headTopY * scale)       (must be > 0)
+
+      Worked example — 972x727 card at y=1193, 1080x1920 source, P=22, head top y=143:
+          scale 0.9 · scaledH 1728 · overflow 1001 · cropOffset 220
+          top 973 · clip bottom 1508 · overhang 220 - 129 = 91px
+
+      Find headTopY by reading the matte's alpha, and decode it with the VP9
+      decoder named explicitly — ffmpeg silently drops the alpha plane otherwise
+      and every pixel reads opaque:
+
+          ffmpeg -c:v libvpx-vp9 -i assets/head-cutout.webm -frames:v 1 -pix_fmt rgba f.png
+
+      ⚠ Verify with `hyperframes snapshot`, not the browser preview: the render
+        path pre-extracts frames through ffmpeg, so alpha can survive preview and
+        still be lost in the render.
+
+      ⚠ remove-background is u2net_human_seg — SEGMENTATION, not matting. It holds
+        up when the subject separates cleanly from the background, and degrades at
+        exactly the hair edge this effect puts on display. Expect a faint fringe
+        tinted by the original background; invisible at feed size, obvious at 2x.
+        Shoot with real separation between hair and wall and it mostly goes away.
+    -->
+
+    <style>
+      /* ---- PART 2: paste alongside the shell CSS ---- */
+      .headcut {
+        position: absolute;
+        left: 56px; /* = .headcard left */
+        top: 973px; /* = CARD_TOP - cropOffset */
+        width: 972px; /* = .headcard width */
+        height: 1728px; /* = scaledH — NOT the card height */
+        /* No object-fit: explicit width/height reproduces the cover scale exactly. */
+        clip-path: inset(0px 0px 1508px 0px); /* hide everything below the card edge */
+        z-index: 2;
+      }
+    </style>
+
+    <!-- One cutout per head slot. Timing and data-media-start MUST match the card
+         beneath it, or the two copies desync and the seam tears. -->
+    <video
+      id="head-a-cut"
+      class="clip headcut"
+      src="assets/head-cutout.webm"
+      data-start="0"
+      data-duration="8"
+      data-media-start="1"
+      data-track-index="4"
+      muted
+      playsinline
+    ></video>
   </body>
 </html>
